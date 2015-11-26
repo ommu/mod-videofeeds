@@ -32,7 +32,9 @@
  * @property integer $view
  * @property integer $likes
  * @property string $creation_date
+ * @property string $creation_id
  * @property string $modified_date
+ * @property string $modified_id
  *
  * The followings are the available model relations:
  * @property OmmuVideoLikes[] $ommuVideoLikes
@@ -41,7 +43,7 @@
 class Videos extends CActiveRecord
 {
 	public $defaultColumns = array();
-	
+
 	// Variable Search
 	public $user_search;
 
@@ -73,13 +75,13 @@ class Videos extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('cat_id, title, media', 'required'),
-			array('publish, cat_id, headline, comment_code, comment, view, likes', 'numerical', 'integerOnly'=>true),
+			array('publish, cat_id, headline, comment_code, comment, view, likes, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('user_id', 'length', 'max'=>11),
 			array('title, media', 'length', 'max'=>128),
 			array('user_id, body, comment, view, likes, creation_date, modified_date', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('video_id, publish, cat_id, user_id, headline, comment_code, title, body, media, comment, view, likes, creation_date, modified_date,
+			array('video_id, publish, cat_id, user_id, headline, comment_code, title, body, media, comment, view, likes, creation_date, creation_id, modified_date, modified_id,
 				user_search', 'safe', 'on'=>'search'),
 		);
 	}
@@ -117,7 +119,9 @@ class Videos extends CActiveRecord
 			'view' => 'View',
 			'likes' => 'Likes',
 			'creation_date' => Phrase::trans(25024,1),
+			'creation_id' => 'Creation',
 			'modified_date' => Phrase::trans(25025,1),
+			'modified_id' => 'Modified',
 			'user_search' => 'User',
 		);
 	}
@@ -171,9 +175,11 @@ class Videos extends CActiveRecord
 		$criteria->compare('t.likes',$this->likes);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		$criteria->compare('t.creation_id',$this->creation_id);
 		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
-		
+		$criteria->compare('t.modified_id',$this->modified_id);
+
 		// Custom Search
 		$criteria->with = array(
 			'user' => array(
@@ -225,7 +231,10 @@ class Videos extends CActiveRecord
 			$this->defaultColumns[] = 'view';
 			$this->defaultColumns[] = 'likes';
 			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
 			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
+			$this->defaultColumns[] = 'count_article';
 		}
 
 		return $this->defaultColumns;
@@ -336,10 +345,10 @@ class Videos extends CActiveRecord
 				'select' => $column
 			));
 			return $model->$column;
-			
+
 		} else {
 			$model = self::model()->findByPk($id);
-			return $model;			
+			return $model;
 		}
 	}
 
@@ -349,17 +358,19 @@ class Videos extends CActiveRecord
 	protected function beforeValidate() {
 		$controller = strtolower(Yii::app()->controller->id);
 		if(parent::beforeValidate()) {
-			if($this->isNewRecord) {
-				$this->user_id = Yii::app()->user->id;			
-			}
+			if($this->isNewRecord)
+				$this->user_id = Yii::app()->user->id;
+			else
+				$this->modified_id = Yii::app()->user->id;
+
 			if($this->headline == 1 && $this->publish == 0) {
 				$this->addError('publish', Phrase::trans(340,0));
 			}
 		}
 		return true;
 	}
-	
-	
+
+
 	/**
 	 * After save attributes
 	 */
@@ -367,7 +378,7 @@ class Videos extends CActiveRecord
 		parent::afterSave();
 		if($this->headline == 1) {
 			self::model()->updateAll(array(
-				'headline' => 0,	
+				'headline' => 0,
 			), array(
 				'condition'=> 'video_id != :id',
 				'params'=>array(':id'=>$this->video_id),

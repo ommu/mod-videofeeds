@@ -25,6 +25,8 @@
  * @property string $meta_keyword
  * @property string $meta_description
  * @property integer $headline
+ * @property string $modified_date
+ * @property string $modified_id
  */
 class VideoSetting extends CActiveRecord
 {
@@ -58,11 +60,11 @@ class VideoSetting extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('license, permission, meta_keyword, meta_description, headline', 'required'),
-			array('permission, headline', 'numerical', 'integerOnly'=>true),
+			array('permission, headline, modified_id', 'numerical', 'integerOnly'=>true),
 			array('license', 'length', 'max'=>32),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, license, permission, meta_keyword, meta_description, headline', 'safe', 'on'=>'search'),
+			array('id, license, permission, meta_keyword, meta_description, headline, modified_date, modified_id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -89,6 +91,8 @@ class VideoSetting extends CActiveRecord
 			'meta_keyword' => Phrase::trans(25038,1),
 			'meta_description' => Phrase::trans(25039,1),
 			'headline' => 'Headline',
+			'modified_date' => 'Modified Date',
+			'modified_id' => 'Modified ID',
 		);
 	}
 
@@ -116,6 +120,9 @@ class VideoSetting extends CActiveRecord
 		$criteria->compare('t.meta_keyword',$this->meta_keyword,true);
 		$criteria->compare('t.meta_description',$this->meta_description,true);
 		$criteria->compare('t.headline',$this->headline);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		$criteria->compare('t.modified_id',$this->modified_id);
 
 		if(!isset($_GET['VideoSetting_sort']))
 			$criteria->order = 'id DESC';
@@ -149,6 +156,8 @@ class VideoSetting extends CActiveRecord
 			$this->defaultColumns[] = 'meta_keyword';
 			$this->defaultColumns[] = 'meta_description';
 			$this->defaultColumns[] = 'headline';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -165,6 +174,8 @@ class VideoSetting extends CActiveRecord
 			$this->defaultColumns[] = 'meta_keyword';
 			$this->defaultColumns[] = 'meta_description';
 			$this->defaultColumns[] = 'headline';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 		parent::afterConstruct();
 	}
@@ -179,11 +190,21 @@ class VideoSetting extends CActiveRecord
 				'select' => $column
 			));
 			return $model->$column;
-			
+
 		} else {
 			$model = self::model()->findByPk($id);
-			return $model;			
+			return $model;
 		}
+	}
+
+	/**
+	 * before validate attributes
+	 */
+	protected function beforeValidate() {
+		if(parent::beforeValidate()) {
+			$this->modified_id = Yii::app()->user->id;
+		}
+		return true;
 	}
 
 }
