@@ -1,14 +1,15 @@
 <?php
 /**
- * SettingController
- * @var $this SettingController
- * @var $model VideoSetting * @var $form CActiveForm
+ * SiteController
+ * @var $this SiteController
+ * @var $model Videos * @var $form CActiveForm
  * Copyright (c) 2014, Ommu Platform (ommu.co). All rights reserved.
  * version: 0.0.1
  * Reference start
  *
  * TOC :
  *	Index
+ *	View
  *
  *	LoadModel
  *	performAjaxValidation
@@ -21,7 +22,7 @@
  *----------------------------------------------------------------------------------------------------------
  */
 
-class SettingController extends Controller
+class SiteController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -35,17 +36,9 @@ class SettingController extends Controller
 	 */
 	public function init() 
 	{
-		if(!Yii::app()->user->isGuest) {
-			if(Yii::app()->user->level == 1) {
-				$arrThemes = Utility::getCurrentTemplate('admin');
-				Yii::app()->theme = $arrThemes['folder'];
-				$this->layout = $arrThemes['layout'];
-			} else {
-				$this->redirect(Yii::app()->createUrl('site/login'));
-			}
-		} else {
-			$this->redirect(Yii::app()->createUrl('site/login'));
-		}
+		$arrThemes = Utility::getCurrentTemplate('public');
+		Yii::app()->theme = $arrThemes['folder'];
+		$this->layout = $arrThemes['layout'];
 	}
 
 	/**
@@ -68,7 +61,7 @@ class SettingController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array(),
+				'actions'=>array('index','view'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -78,7 +71,7 @@ class SettingController extends Controller
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('index'),
+				'actions'=>array(),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
 			),
@@ -97,70 +90,51 @@ class SettingController extends Controller
 	 */
 	public function actionIndex() 
 	{
-		$category=new VideoCategory('search');
-		$category->unsetAttributes();  // clear any default values
-		if(isset($_GET['VideoCategory'])) {
-			$category->attributes=$_GET['VideoCategory'];
-		}
+		$setting = VideoSetting::model()->findByPk(1,array(
+			'select' => 'meta_description, meta_keyword',
+		));
 
-		$columnTemp = array();
-		if(isset($_GET['GridColumn'])) {
-			foreach($_GET['GridColumn'] as $key => $val) {
-				if($_GET['GridColumn'][$key] == 1) {
-					$columnTemp[] = $key;
-				}
-			}
-		}
-		$columns = $category->getGridColumn($columnTemp);
+		$criteria=new CDbCriteria;
+		$criteria->condition = 'publish = :publish';
+		$criteria->params = array(':publish'=>1);
+		$criteria->order = 'creation_date DESC';
+
+		$dataProvider = new CActiveDataProvider('Videos', array(
+			'criteria'=>$criteria,
+			'pagination'=>array(
+				'pageSize'=>7,
+			),
+		));
 		
-		$model=$this->loadModel(1);
+		$this->pageTitleShow = true;
+		$this->pageTitle = 'Video BPAD Jogja';
+		$this->pageDescription = $setting->meta_description;
+		$this->pageMeta = $setting->meta_keyword;
+		$this->render('front_index',array(
+			'dataProvider'=>$dataProvider,
+		));
+	}
+	
+	/**
+	 * Displays a particular model.
+	 * @param integer $id the ID of the model to be displayed
+	 */
+	public function actionView($id) 
+	{
+		$setting = VideoSetting::model()->findByPk(1,array(
+			'select' => 'meta_keyword',
+		));
 
-		// Uncomment the following line if AJAX validation is needed
-		$this->performAjaxValidation($model);
-
-		if(isset($_POST['VideoSetting'])) {
-			$model->attributes=$_POST['VideoSetting'];
-			
-			$jsonError = CActiveForm::validate($model);
-			if(strlen($jsonError) > 2) {
-				$errors = $model->getErrors();
-				$summary['msg'] = "<div class='errorSummary'><strong>Please fix the following input errors:</strong>";
-				$summary['msg'] .= "<ul>";
-				foreach($errors as $key => $value) {
-					$summary['msg'] .= "<li>{$value[0]}</li>";
-				}
-				$summary['msg'] .= "</ul></div>";
-
-				$message = json_decode($jsonError, true);
-				$merge = array_merge_recursive($summary, $message);
-				$encode = json_encode($merge);
-				echo $encode;
-
-			} else {
-				if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
-					if($model->save()) {
-						echo CJSON::encode(array(
-							'type' => 0,
-							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25037,1).'</strong></div>',
-						));
-					} else {
-						print_r($model->getErrors());
-					}
-				}
-			}
-			Yii::app()->end();
-			
-		} else {
-			$this->pageTitle = Phrase::trans(25029,1);
-			$this->pageDescription = Phrase::trans(25028,1);
-			$this->pageMeta = '';
-			$this->render('admin_index',array(
-				'model'=>$model,
-				'category' => $category,
-				'columns' => $columns,
-			));
-			
-		}
+		$model=$this->loadModel($id);
+		Videos::model()->updateByPk($id, array('view'=>$model->view + 1));
+		
+		$this->pageTitleShow = true;
+		$this->pageTitle = $model->title;
+		$this->pageDescription = Utility::shortText(Utility::hardDecode($model->body),300);
+		$this->pageMeta = $setting->meta_keyword;
+		$this->render('front_view',array(
+			'model'=>$model,
+		));
 	}
 
 	/**
@@ -170,7 +144,7 @@ class SettingController extends Controller
 	 */
 	public function loadModel($id) 
 	{
-		$model = VideoSetting::model()->findByPk($id);
+		$model = Videos::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404, Phrase::trans(193,0));
 		return $model;
@@ -182,7 +156,7 @@ class SettingController extends Controller
 	 */
 	protected function performAjaxValidation($model) 
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='video-setting-form') {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='videos-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}
