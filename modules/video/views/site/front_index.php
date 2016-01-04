@@ -1,7 +1,9 @@
 <?php
 /**
  * Videoses (videos)
- * @var $this SiteController * @var $model Videos * @var $dataProvider CActiveDataProvider
+ * @var $this SiteController
+ * @var $model Videos
+ * @var $dataProvider CActiveDataProvider
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)

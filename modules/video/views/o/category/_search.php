@@ -1,7 +1,9 @@
 <?php
 /**
  * Video Categories (video-category)
- * @var $this CategoryController * @var $model VideoCategory * @var $form CActiveForm
+ * @var $this CategoryController
+ * @var $model VideoCategory
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)

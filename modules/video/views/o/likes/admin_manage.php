@@ -1,7 +1,9 @@
 <?php
 /**
  * Video Likes (video-likes)
- * @var $this LikesController * @var $model VideoLikes *
+ * @var $this LikesController
+ * @var $model VideoLikes
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Video-Albums

@@ -1,7 +1,9 @@
 <?php
 /**
  * Video Settings (video-setting)
- * @var $this SettingController * @var $model VideoSetting *
+ * @var $this SettingController
+ * @var $model VideoSetting
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Video-Albums
@@ -18,7 +20,7 @@
 
 <?php //begin.Search ?>
 <div class="search-form">
-<?php $this->renderPartial('/category/_search',array(
+<?php $this->renderPartial('/o/category/_search',array(
 	'model'=>$category,
 )); ?>
 </div>
@@ -26,7 +28,7 @@
 
 <?php //begin.Grid Option ?>
 <div class="grid-form">
-<?php $this->renderPartial('/category/_option_form',array(
+<?php $this->renderPartial('/o/category/_option_form',array(
 	'model'=>$category,
 )); ?>
 </div>
@@ -58,19 +60,19 @@
 						'options' => array(							
 							'class' => 'view',
 						),
-						'url' => 'Yii::app()->controller->createUrl("category/view",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("o/category/view",array("id"=>$data->primaryKey))'),
 					'update' => array(
 						'label' => 'update',
 						'options' => array(
 							'class' => 'update'
 						),
-						'url' => 'Yii::app()->controller->createUrl("category/edit",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("o/category/edit",array("id"=>$data->primaryKey))'),
 					'delete' => array(
 						'label' => 'delete',
 						'options' => array(
 							'class' => 'delete'
 						),
-						'url' => 'Yii::app()->controller->createUrl("category/delete",array("id"=>$data->primaryKey))')
+						'url' => 'Yii::app()->controller->createUrl("o/category/delete",array("id"=>$data->primaryKey))')
 				),
 				'template' => '{update}|{delete}',
 			));

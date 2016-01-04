@@ -1,6 +1,7 @@
 <?php
 /**
- * Videos * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * Videos
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Video-Albums
  * @contact (+62)856-299-4114
@@ -46,6 +47,8 @@ class Videos extends CActiveRecord
 
 	// Variable Search
 	public $user_search;
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -82,7 +85,7 @@ class Videos extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('video_id, publish, cat_id, user_id, headline, comment_code, title, body, media, comment, view, likes, creation_date, creation_id, modified_date, modified_id,
-				user_search', 'safe', 'on'=>'search'),
+				user_search, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -94,9 +97,11 @@ class Videos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'like' => array(self::HAS_MANY, 'VideoLikes', 'video_id'),
 			'cat' => array(self::BELONGS_TO, 'VideoCategory', 'cat_id'),
 			'user' => array(self::BELONGS_TO, 'Users', 'user_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'like' => array(self::HAS_MANY, 'VideoLikes', 'video_id'),
 		);
 	}
 
@@ -123,6 +128,8 @@ class Videos extends CActiveRecord
 			'modified_date' => Phrase::trans(25025,1),
 			'modified_id' => 'Modified',
 			'user_search' => 'User',
+			'creation_search' => 'Creation',
+			'modified_search' => 'Modified',
 		);
 	}
 
@@ -145,26 +152,24 @@ class Videos extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('t.video_id',$this->video_id,true);
-		if(isset($_GET['type']) && $_GET['type'] == 'publish') {
+		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
-		} elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish') {
+		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
 			$criteria->compare('t.publish',0);
-		} elseif(isset($_GET['type']) && $_GET['type'] == 'trash') {
+		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
 			$criteria->compare('t.publish',2);
-		} else {
+		else {
 			$criteria->addInCondition('t.publish',array(0,1));
 			$criteria->compare('t.publish',$this->publish);
 		}
-		if(isset($_GET['cat'])) {
+		if(isset($_GET['cat']))
 			$criteria->compare('t.cat_id',$_GET['cat']);
-		} else {
+		else
 			$criteria->compare('t.cat_id',$this->cat_id);
-		}
-		if(isset($_GET['user'])) {
+		if(isset($_GET['user']))
 			$criteria->compare('t.user_id',$_GET['user']);
-		} else {
+		else
 			$criteria->compare('t.user_id',$this->user_id);
-		}
 		$criteria->compare('t.headline',$this->headline);
 		$criteria->compare('t.comment_code',$this->comment_code);
 		$criteria->compare('t.title',$this->title,true);
@@ -186,8 +191,18 @@ class Videos extends CActiveRecord
 				'alias'=>'user',
 				'select'=>'displayname'
 			),
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
+			),
 		);
 		$criteria->compare('user.displayname',strtolower($this->user_search), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['Videos_sort']))
 			$criteria->order = 'video_id DESC';
@@ -274,7 +289,7 @@ class Videos extends CActiveRecord
 				);
 			}
 			$this->defaultColumns[] = array(
-				'name' => 'user_search',
+				'name' => 'creation_search',
 				'value' => '$data->user->displayname',
 			);
 			$this->defaultColumns[] = array(
@@ -363,9 +378,8 @@ class Videos extends CActiveRecord
 			else
 				$this->modified_id = Yii::app()->user->id;
 
-			if($this->headline == 1 && $this->publish == 0) {
+			if($this->headline == 1 && $this->publish == 0)
 				$this->addError('publish', Phrase::trans(340,0));
-			}
 		}
 		return true;
 	}

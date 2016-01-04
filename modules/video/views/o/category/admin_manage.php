@@ -1,7 +1,9 @@
 <?php
 /**
  * Video Categories (video-category)
- * @var $this CategoryController * @var $model VideoCategory *
+ * @var $this CategoryController 
+ * @var $model VideoCategory
+ *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Video-Albums

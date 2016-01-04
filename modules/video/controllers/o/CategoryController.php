@@ -2,8 +2,8 @@
 /**
  * CategoryController
  * @var $this CategoryController
- * @var $model VideoCategory * @var $form CActiveForm
- * Copyright (c) 2014, Ommu Platform (ommu.co). All rights reserved.
+ * @var $model VideoCategory 
+ * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
  *
@@ -159,7 +159,7 @@ class CategoryController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('setting/index'),
+							'get' => Yii::app()->controller->createUrl('o/setting/index'),
 							'id' => 'partial-video-category',
 							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25016,1).'</strong></div>',
 						));
@@ -208,7 +208,7 @@ class CategoryController extends Controller
 					if($model->save()) {
 						echo CJSON::encode(array(
 							'type' => 5,
-							'get' => Yii::app()->controller->createUrl('setting/index'),
+							'get' => Yii::app()->controller->createUrl('o/setting/index'),
 							'id' => 'partial-video-category',
 							'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25018,1).'</strong></div>',
 						));
@@ -284,7 +284,7 @@ class CategoryController extends Controller
 				if($model->delete()) {
 					echo CJSON::encode(array(
 						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('setting/index'),
+						'get' => Yii::app()->controller->createUrl('o/setting/index'),
 						'id' => 'partial-video-category',
 						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25020,1).'</strong></div>',
 					));
@@ -329,7 +329,7 @@ class CategoryController extends Controller
 				if($model->update()) {
 					echo CJSON::encode(array(
 						'type' => 5,
-						'get' => Yii::app()->controller->createUrl('setting/index'),
+						'get' => Yii::app()->controller->createUrl('o/setting/index'),
 						'id' => 'partial-video-category',
 						'msg' => '<div class="errorSummary success"><strong>'.Phrase::trans(25018,1).'</strong></div>',
 					));

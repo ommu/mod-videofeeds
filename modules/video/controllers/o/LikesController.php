@@ -2,15 +2,13 @@
 /**
  * LikesController
  * @var $this LikesController
- * @var $model VideoLikes * @var $form CActiveForm
- * Copyright (c) 2014, Ommu Platform (ommu.co). All rights reserved.
+ * @var $model VideoLikes
+ * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
  *
  * TOC :
  *	Index
-*	Up
-*	Down
  *	Manage
  *	Delete
  *
@@ -48,13 +46,7 @@ class LikesController extends Controller
 				$this->redirect(Yii::app()->createUrl('site/login'));
 			}
 		} else {
-			if(VideoSetting::getInfo('permission') == 1) {
-				$arrThemes = Utility::getCurrentTemplate('public');
-				Yii::app()->theme = $arrThemes['folder'];
-				$this->layout = $arrThemes['layout'];
-			} else {
-				$this->redirect(Yii::app()->createUrl('site/index'));
-			}
+			$this->redirect(Yii::app()->createUrl('site/login'));
 		}
 	}
 
@@ -82,7 +74,7 @@ class LikesController extends Controller
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('up','down'),
+				'actions'=>array(),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level)',
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
@@ -109,49 +101,6 @@ class LikesController extends Controller
 	{
 		$this->redirect(array('manage'));
 	}
-	
-	/**
-	 * Creates a new model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 */
-	public function actionUp($id=null) 
-	{
-		$arrThemes = Utility::getCurrentTemplate('public');
-		Yii::app()->theme = $arrThemes['folder'];
-		$this->layout = $arrThemes['layout'];
-		Utility::applyCurrentTheme($this->module);
-		
-		if($id == null) {
-			$this->redirect(array('site/index'));
-		} else {
-			$model=new VideoLikes;
-			$model->video_id = $id;
-			if($model->save()) {
-				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>Utility::getUrlTitle($model->video->title)));
-			}	
-		}
-	}
-	
-	/**
-	 * Creates a new model.
-	 * If creation is successful, the browser will be redirected to the 'view' page.
-	 */
-	public function actionDown($id=null) 
-	{
-		$arrThemes = Utility::getCurrentTemplate('public');
-		Yii::app()->theme = $arrThemes['folder'];
-		$this->layout = $arrThemes['layout'];
-		Utility::applyCurrentTheme($this->module);
-		
-		if($id == null) {
-			$this->redirect(array('site/index'));
-		} else {
-			$model=$this->loadModel($id);
-			if($model->delete()) {
-				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>Utility::getUrlTitle($model->video->title)));
-			}	
-		}
-	}	
 
 	/**
 	 * Manages all models.

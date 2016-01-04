@@ -2,8 +2,8 @@
 /**
  * SettingController
  * @var $this SettingController
- * @var $model VideoSetting * @var $form CActiveForm
- * Copyright (c) 2014, Ommu Platform (ommu.co). All rights reserved.
+ * @var $model VideoSetting
+ * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
  *

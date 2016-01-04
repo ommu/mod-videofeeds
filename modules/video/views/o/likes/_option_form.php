@@ -1,7 +1,9 @@
 <?php
 /**
  * Video Likes (video-likes)
- * @var $this LikesController * @var $model VideoLikes * @var $form CActiveForm
+ * @var $this LikesController
+ * @var $model VideoLikes
+ * @var $form CActiveForm
  *
  * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)

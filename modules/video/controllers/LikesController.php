@@ -1,15 +1,16 @@
 <?php
 /**
- * SiteController
- * @var $this SiteController
- * @var $model Videos
+ * LikesController
+ * @var $this LikesController
+ * @var $model VideoLikes
  * @var $form CActiveForm
  * version: 0.0.1
  * Reference start
  *
  * TOC :
  *	Index
- *	View
+ *	Up
+ *	Down
  *
  *	LoadModel
  *	performAjaxValidation
@@ -22,7 +23,7 @@
  *----------------------------------------------------------------------------------------------------------
  */
 
-class SiteController extends Controller
+class LikesController extends Controller
 {
 	/**
 	 * @var string the default layout for the views. Defaults to '//layouts/column2', meaning
@@ -36,9 +37,13 @@ class SiteController extends Controller
 	 */
 	public function init() 
 	{
-		$arrThemes = Utility::getCurrentTemplate('public');
-		Yii::app()->theme = $arrThemes['folder'];
-		$this->layout = $arrThemes['layout'];
+		if(VideoSetting::getInfo('permission') == 1) {
+			$arrThemes = Utility::getCurrentTemplate('public');
+			Yii::app()->theme = $arrThemes['folder'];
+			$this->layout = $arrThemes['layout'];
+		} else {
+			$this->redirect(Yii::app()->createUrl('site/index'));
+		}
 	}
 
 	/**
@@ -61,19 +66,14 @@ class SiteController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','view'),
+				'actions'=>array('index'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array(),
+				'actions'=>array('up','down'),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level)',
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
-			),
-			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array(),
-				'users'=>array('@'),
-				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
 			),
 			array('allow', // allow admin user to perform 'admin' and 'delete' actions
 				'actions'=>array(),
@@ -90,51 +90,40 @@ class SiteController extends Controller
 	 */
 	public function actionIndex() 
 	{
-		$setting = VideoSetting::model()->findByPk(1,array(
-			'select' => 'meta_description, meta_keyword',
-		));
-
-		$criteria=new CDbCriteria;
-		$criteria->condition = 'publish = :publish';
-		$criteria->params = array(':publish'=>1);
-		$criteria->order = 'creation_date DESC';
-
-		$dataProvider = new CActiveDataProvider('Videos', array(
-			'criteria'=>$criteria,
-			'pagination'=>array(
-				'pageSize'=>7,
-			),
-		));
-		
-		$this->pageTitleShow = true;
-		$this->pageTitle = 'Video BPAD Jogja';
-		$this->pageDescription = $setting->meta_description;
-		$this->pageMeta = $setting->meta_keyword;
-		$this->render('front_index',array(
-			'dataProvider'=>$dataProvider,
-		));
+		$this->redirect(Yii::app()->createUrl('site/index'));
 	}
 	
 	/**
-	 * Displays a particular model.
-	 * @param integer $id the ID of the model to be displayed
+	 * Creates a new model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
 	 */
-	public function actionView($id) 
+	public function actionUp($id=null) 
 	{
-		$setting = VideoSetting::model()->findByPk(1,array(
-			'select' => 'meta_keyword',
-		));
-
-		$model=$this->loadModel($id);
-		Videos::model()->updateByPk($id, array('view'=>$model->view + 1));
-		
-		$this->pageTitleShow = true;
-		$this->pageTitle = $model->title;
-		$this->pageDescription = Utility::shortText(Utility::hardDecode($model->body),300);
-		$this->pageMeta = $setting->meta_keyword;
-		$this->render('front_view',array(
-			'model'=>$model,
-		));
+		if($id == null) {
+			$this->redirect(array('site/index'));
+		} else {
+			$model=new VideoLikes;
+			$model->video_id = $id;
+			if($model->save()) {
+				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>Utility::getUrlTitle($model->video->title)));
+			}	
+		}
+	}
+	
+	/**
+	 * Creates a new model.
+	 * If creation is successful, the browser will be redirected to the 'view' page.
+	 */
+	public function actionDown($id=null) 
+	{
+		if($id == null) {
+			$this->redirect(array('site/index'));
+		} else {
+			$model=$this->loadModel($id);
+			if($model->delete()) {
+				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>Utility::getUrlTitle($model->video->title)));
+			}	
+		}
 	}
 
 	/**
@@ -144,7 +133,7 @@ class SiteController extends Controller
 	 */
 	public function loadModel($id) 
 	{
-		$model = Videos::model()->findByPk($id);
+		$model = VideoLikes::model()->findByPk($id);
 		if($model===null)
 			throw new CHttpException(404, Phrase::trans(193,0));
 		return $model;
@@ -156,7 +145,7 @@ class SiteController extends Controller
 	 */
 	protected function performAjaxValidation($model) 
 	{
-		if(isset($_POST['ajax']) && $_POST['ajax']==='videos-form') {
+		if(isset($_POST['ajax']) && $_POST['ajax']==='video-likes-form') {
 			echo CActiveForm::validate($model);
 			Yii::app()->end();
 		}

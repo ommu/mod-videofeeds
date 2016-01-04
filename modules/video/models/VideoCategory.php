@@ -1,6 +1,7 @@
 <?php
 /**
- * VideoCategory * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
+ * VideoCategory
+ * @author Putra Sudaryanto <putra.sudaryanto@gmail.com>
  * @copyright Copyright (c) 2014 Ommu Platform (ommu.co)
  * @link https://github.com/oMMu/Ommu-Video-Albums
  * @contact (+62)856-299-4114
@@ -39,6 +40,10 @@ class VideoCategory extends CActiveRecord
 	public $title;
 	public $description;
 	public $count_video;
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -79,7 +84,7 @@ class VideoCategory extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('cat_id, publish, dependency, orders, name, desc, creation_date, creation_id, modified_date, modified_id,
-				title, description, count_video', 'safe', 'on'=>'search'),
+				title, description, count_video, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -91,9 +96,10 @@ class VideoCategory extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'view_cat' => array(self::BELONGS_TO, 'ViewVideoCategory', 'cat_id'),
+			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 			'video' => array(self::HAS_MANY, 'Videos', 'cat_id'),
-			'title' => array(self::BELONGS_TO, 'OmmuSystemPhrase', 'name'),
-			'description' => array(self::BELONGS_TO, 'OmmuSystemPhrase', 'desc'),
 		);
 	}
 
@@ -116,6 +122,8 @@ class VideoCategory extends CActiveRecord
 			'title' => Phrase::trans(25009,1),
 			'description' => Phrase::trans(25010,1),
 			'count_video' => 'Video',
+			'creation_search' => 'Creation',
+			'modified_search' => 'Modified',
 		);
 	}
 
@@ -162,19 +170,25 @@ class VideoCategory extends CActiveRecord
 
 		// Custom Search
 		$criteria->with = array(
-			'title' => array(
-				'alias'=>'title',
-				'select'=>'en'
+			'view_cat' => array(
+				'alias'=>'view_cat',
+				'select'=>'category_name, category_desc'
 			),
-			'description' => array(
-				'alias'=>'description',
-				'select'=>'en'
+			'creation_relation' => array(
+				'alias'=>'creation_relation',
+				'select'=>'displayname'
+			),
+			'modified_relation' => array(
+				'alias'=>'modified_relation',
+				'select'=>'displayname'
 			),
 		);
-		$criteria->compare('title.en',strtolower($this->title), true);
-		$criteria->compare('description.en',strtolower($this->description), true);
+		$criteria->compare('view_cat.category_name',strtolower($this->title), true);
+		$criteria->compare('view_cat.category_desc',strtolower($this->description), true);
+		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
-		if(!isset($_GET['VideoCategory_sort']))
+		if(isset($_GET['VideoCategory_sort']))
 			$criteria->order = 'cat_id DESC';
 
 		return new CActiveDataProvider($this, array(
@@ -250,8 +264,12 @@ class VideoCategory extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'header' => 'count_video',
-				'value' => 'CHtml::link($data->count_video." ".Phrase::trans(25000,1), Yii::app()->controller->createUrl("admin/manage",array("category"=>$data->cat_id)))',
+				'value' => 'CHtml::link($data->count_video." ".Phrase::trans(25000,1), Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
 				'type' => 'raw',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation_relation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -373,7 +391,7 @@ class VideoCategory extends CActiveRecord
 		if(parent::beforeValidate()) {
 			if($this->isNewRecord) {
 				$this->orders = 0;
-				$this->creation_id = Yii::app()->user->id;
+				$this->user_id = Yii::app()->user->id;
 			} else
 				$this->modified_id = Yii::app()->user->id;
 		}
