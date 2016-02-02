@@ -205,7 +205,7 @@ class Videos extends CActiveRecord
 		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['Videos_sort']))
-			$criteria->order = 'video_id DESC';
+			$criteria->order = 't.video_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
