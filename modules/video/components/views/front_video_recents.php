@@ -12,7 +12,7 @@
 <div class="box recent-news-video">
 	<h3>Video Terbaru</h3>
 	<ul>
-		<?php 
+		<?php
 		$i=0;
 		foreach($model as $key => $val) {
 		$i++;
