@@ -384,7 +384,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Phrase::trans(338,0);
+			$this->pageTitle = Yii::t('phrase', 'Headline');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_headline');
