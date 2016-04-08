@@ -368,6 +368,34 @@ class Videos extends CActiveRecord
 	}
 
 	/**
+	 * Albums get information
+	 */
+	public function searchIndexing($index)
+	{
+		Yii::import('application.modules.video.models.*');
+		
+		$criteria=new CDbCriteria;
+		$criteria->compare('t.publish', 1);
+		$criteria->order = 'video_id DESC';
+		//$criteria->limit = 10;
+		$model = Videos::model()->findAll($criteria);
+		foreach($model as $key => $item) {				
+			$doc = new Zend_Search_Lucene_Document();
+			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('id', CHtml::encode($item->video_id), 'utf-8')); 
+			$doc->addField(Zend_Search_Lucene_Field::Keyword('category', CHtml::encode(Phrase::trans($item->cat->name,2)), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::Text('media', CHtml::encode('https://www.youtube.com/watch?v='.$item->media), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::Text('title', CHtml::encode($item->title), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::Text('body', CHtml::encode(Utility::hardDecode(Utility::softDecode($item->body))), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::Text('url', CHtml::encode(Utility::getProtocol().'://'.Yii::app()->request->serverName.Yii::app()->createUrl('video/site/view', array('id'=>$item->video_id,'t'=>Utility::getUrlTitle($item->title)))), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('date', CHtml::encode(Utility::dateFormat($item->creation_date, true).' WIB'), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('creation', CHtml::encode($item->user->displayname), 'utf-8'));
+			$index->addDocument($doc);			
+		}
+		
+		return true;		
+	}
+
+	/**
 	 * before validate attributes
 	 */
 	protected function beforeValidate() {
