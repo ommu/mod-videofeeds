@@ -97,8 +97,8 @@ class VideoCategory extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'view_cat' => array(self::BELONGS_TO, 'ViewVideoCategory', 'cat_id'),
-			'creation_relation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
-			'modified_relation' => array(self::BELONGS_TO, 'Users', 'modified_id'),
+			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
 			'video' => array(self::HAS_MANY, 'Videos', 'cat_id'),
 		);
 	}
@@ -174,19 +174,19 @@ class VideoCategory extends CActiveRecord
 				'alias'=>'view_cat',
 				'select'=>'category_name, category_desc'
 			),
-			'creation_relation' => array(
-				'alias'=>'creation_relation',
+			'creation' => array(
+				'alias'=>'creation',
 				'select'=>'displayname'
 			),
-			'modified_relation' => array(
-				'alias'=>'modified_relation',
+			'modified' => array(
+				'alias'=>'modified',
 				'select'=>'displayname'
 			),
 		);
 		$criteria->compare('view_cat.category_name',strtolower($this->title), true);
 		$criteria->compare('view_cat.category_desc',strtolower($this->description), true);
-		$criteria->compare('creation_relation.displayname',strtolower($this->creation_search), true);
-		$criteria->compare('modified_relation.displayname',strtolower($this->modified_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['VideoCategory_sort']))
 			$criteria->order = 't.cat_id DESC';
@@ -269,7 +269,7 @@ class VideoCategory extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
-				'value' => '$data->creation_relation->displayname',
+				'value' => '$data->creation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
