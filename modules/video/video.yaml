@@ -15,13 +15,23 @@ plugin_menu		:
 		urlRules: {siteType: "0,1", userLevel: "1,2"}
 		urlPath: {url: o/admin/manage, attr: -, icon: -}
 		
-	- urlTitle: Video Settings
+	- urlTitle: Datas
 		urlRules: {siteType: "0,1", userLevel: "1,2"}
-		urlPath: {url: o/setting/index, attr: -, icon: -}
+		urlPath: {url: -, attr: -, icon: -}
 		submenu :
+			- urlTitle: Categories
+				urlRules: {siteType: "0,1", userLevel: 1}
+				urlPath: {url: o/category/manage, attr: -, icon: -}
+			- urlTitle: Views
+				urlRules: {siteType: "0,1", userLevel: "1,2"}
+				urlPath: {url: o/views/manage, attr: -, icon: -}
 			- urlTitle: Likes
 				urlRules: {siteType: 1, userLevel: "1,2"}
 				urlPath: {url: o/likes/manage, attr: -, icon: -}
+		
+	- urlTitle: Settings
+		urlRules: {siteType: "0,1", userLevel: 1}
+		urlPath: {url: o/setting/edit, attr: -, icon: -}
 
 content_menu	:
 # controller o/admin
@@ -30,19 +40,31 @@ content_menu	:
 		urlPath: {url: add, attr: -, icon: -}
 		
 # controller o/category
-
 	- urlTitle: Add Category
 		urlRules: {video, o/category, manage, siteType: "0,1", userLevel: "1,2"}
 		urlPath: {url: add, attr: -, icon: -}
 		
-# controller o/setting
-
-	- urlTitle: Add Category
-		urlRules: {video, o/setting, index, siteType: "0,1", userLevel: "1,2"}
-		urlPath: {url: o/category/add, attr: -, icon: -}
-		
-# controller o/like
-
+# controller o/views
 	- urlTitle: Back to video manage
-		urlRules: {video, o/like, manage, siteType: 1, userLevel: "1,2"}
+		urlRules: {video, o/views, manage, siteType: 1, userLevel: "1,2"}
 		urlPath: {url: o/admin/manage, attr: -, icon: -}
+		
+# controller o/viewdetail
+	- urlTitle: Back to views manage
+		urlRules: {video, o/viewdetail, manage, siteType: 1, userLevel: "1,2"}
+		urlPath: {url: o/views/manage, attr: -, icon: -}
+		
+# controller o/likes
+	- urlTitle: Back to video manage
+		urlRules: {video, o/likes, manage, siteType: 1, userLevel: "1,2"}
+		urlPath: {url: o/admin/manage, attr: -, icon: -}
+		
+# controller o/likedetail
+	- urlTitle: Back to likes manage
+		urlRules: {video, o/likedetail, manage, siteType: 1, userLevel: "1,2"}
+		urlPath: {url: o/likes/manage, attr: -, icon: -}
+		
+# controller o/setting
+	- urlTitle: Add Category
+		urlRules: {video, o/setting, edit, siteType: "0,1", userLevel: "1,2"}
+		urlPath: {url: o/category/add, attr: -, icon: -}

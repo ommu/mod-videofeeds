@@ -276,11 +276,7 @@ class Videos extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'title',
-				'value' => '$data->title."<br/><span>".Utility::shortText(Utility::hardDecode($data->body),200)."</span>"',
-				'htmlOptions' => array(
-					'class' => 'bold',
-				),
-				'type' => 'raw',
+				'value' => '$data->title',
 			);
 			if(!isset($_GET['category'])) {
 				$this->defaultColumns[] = array(

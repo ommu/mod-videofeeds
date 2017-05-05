@@ -240,11 +240,7 @@ class VideoLikes extends CActiveRecord
 			if(!isset($_GET['video'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'video_search',
-					'value' => '$data->video->title."<br/><span>".Utility::shortText(Utility::hardDecode($data->video->body),150)."</span>"',
-					'htmlOptions' => array(
-						'class' => 'bold',
-					),
-					'type' => 'raw',
+					'value' => '$data->video->title',
 				);
 			}
 			if(!isset($_GET['user'])) {
