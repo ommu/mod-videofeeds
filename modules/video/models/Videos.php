@@ -23,15 +23,11 @@
  * @property string $video_id
  * @property integer $publish
  * @property integer $cat_id
- * @property string $user_id
- * @property integer $headline
- * @property integer $comment_code
  * @property string $title
  * @property string $body
  * @property string $media
- * @property integer $comment
- * @property integer $view
- * @property integer $likes
+ * @property integer $headline
+ * @property integer $comment_code
  * @property string $creation_date
  * @property string $creation_id
  * @property string $modified_date
@@ -46,9 +42,23 @@ class Videos extends CActiveRecord
 	public $defaultColumns = array();
 
 	// Variable Search
-	public $user_search;
 	public $creation_search;
 	public $modified_search;
+
+	/**
+	 * Behaviors for this model
+	 */
+	public function behaviors() 
+	{
+		return array(
+			'sluggable' => array(
+				'class'=>'ext.yii-behavior-sluggable.SluggableBehavior',
+				'columns' => array('title'),
+				'unique' => true,
+				'update' => true,
+			),
+		);
+	}
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -78,14 +88,14 @@ class Videos extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('cat_id, title, media', 'required'),
-			array('publish, cat_id, headline, comment_code, comment, view, likes, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
-			array('user_id', 'length', 'max'=>11),
+			array('publish, cat_id, headline, comment_code, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('creation_id, modified_id', 'length', 'max'=>11),
 			array('title, media', 'length', 'max'=>128),
-			array('user_id, body, comment, view, likes, creation_date, modified_date', 'safe'),
+			array('body', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('video_id, publish, cat_id, user_id, headline, comment_code, title, body, media, comment, view, likes, creation_date, creation_id, modified_date, modified_id,
-				user_search, creation_search, modified_search', 'safe', 'on'=>'search'),
+			array('video_id, publish, cat_id, title, body, media, headline, comment_code, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -97,11 +107,12 @@ class Videos extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+			'view' => array(self::BELONGS_TO, 'ViewVideos', 'video_id'),
 			'cat' => array(self::BELONGS_TO, 'VideoCategory', 'cat_id'),
-			'user' => array(self::BELONGS_TO, 'Users', 'user_id'),
 			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
-			'like' => array(self::HAS_MANY, 'VideoLikes', 'video_id'),
+			'likes' => array(self::HAS_MANY, 'VideoLikes', 'video_id'),
+			'views' => array(self::HAS_MANY, 'VideoViews', 'video_id'),
 		);
 	}
 
@@ -114,20 +125,15 @@ class Videos extends CActiveRecord
 			'video_id' => Yii::t('attribute', 'Video'),
 			'publish' => Yii::t('attribute', 'Publish'),
 			'cat_id' => Yii::t('attribute', 'Category'),
-			'user_id' => Yii::t('attribute', 'User'),
-			'headline' => Yii::t('attribute', 'Headline'),
-			'comment_code' => Yii::t('attribute', 'Comment'),
 			'title' => Yii::t('attribute', 'Title'),
 			'body' => Yii::t('attribute', 'Description'),
 			'media' => Yii::t('attribute', 'Description'),
-			'comment' => Yii::t('attribute', 'Comment'),
-			'view' => Yii::t('attribute', 'View'),
-			'likes' => Yii::t('attribute', 'Likes'),
+			'headline' => Yii::t('attribute', 'Headline'),
+			'comment_code' => Yii::t('attribute', 'Comment'),
 			'creation_date' => Yii::t('attribute', 'Creation Date'),
 			'creation_id' => Yii::t('attribute', 'Creation'),
 			'modified_date' => Yii::t('attribute', 'Modified Date'),
 			'modified_id' => Yii::t('attribute', 'Modified'),
-			'user_search' => Yii::t('attribute', 'User'),
 			'creation_search' => Yii::t('attribute', 'Creation'),
 			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
@@ -151,6 +157,18 @@ class Videos extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
+		// Custom Search
+		$criteria->with = array(
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
+
 		$criteria->compare('t.video_id',$this->video_id,true);
 		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
@@ -162,45 +180,28 @@ class Videos extends CActiveRecord
 			$criteria->addInCondition('t.publish',array(0,1));
 			$criteria->compare('t.publish',$this->publish);
 		}
-		if(isset($_GET['cat']))
-			$criteria->compare('t.cat_id',$_GET['cat']);
+		if(isset($_GET['category']))
+			$criteria->compare('t.cat_id',$_GET['category']);
 		else
 			$criteria->compare('t.cat_id',$this->cat_id);
-		if(isset($_GET['user']))
-			$criteria->compare('t.user_id',$_GET['user']);
-		else
-			$criteria->compare('t.user_id',$this->user_id);
-		$criteria->compare('t.headline',$this->headline);
-		$criteria->compare('t.comment_code',$this->comment_code);
 		$criteria->compare('t.title',$this->title,true);
 		$criteria->compare('t.body',$this->body,true);
 		$criteria->compare('t.media',$this->media,true);
-		$criteria->compare('t.comment',$this->comment);
-		$criteria->compare('t.view',$this->view);
-		$criteria->compare('t.likes',$this->likes);
+		$criteria->compare('t.headline',$this->headline);
+		$criteria->compare('t.comment_code',$this->comment_code);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
-		$criteria->compare('t.creation_id',$this->creation_id);
+		if(isset($_GET['creation']))
+			$criteria->compare('t.creation_id',$_GET['creation']);
+		else
+			$criteria->compare('t.creation_id',$this->creation_id);
 		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
-		$criteria->compare('t.modified_id',$this->modified_id);
-
-		// Custom Search
-		$criteria->with = array(
-			'user' => array(
-				'alias'=>'user',
-				'select'=>'displayname'
-			),
-			'creation' => array(
-				'alias'=>'creation',
-				'select'=>'displayname'
-			),
-			'modified' => array(
-				'alias'=>'modified',
-				'select'=>'displayname'
-			),
-		);
-		$criteria->compare('user.displayname',strtolower($this->user_search), true);
+		if(isset($_GET['modified']))
+			$criteria->compare('t.modified_id',$_GET['modified']);
+		else
+			$criteria->compare('t.modified_id',$this->modified_id);
+		
 		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
 		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
@@ -236,15 +237,11 @@ class Videos extends CActiveRecord
 			//$this->defaultColumns[] = 'video_id';
 			$this->defaultColumns[] = 'publish';
 			$this->defaultColumns[] = 'cat_id';
-			$this->defaultColumns[] = 'user_id';
-			$this->defaultColumns[] = 'headline';
-			$this->defaultColumns[] = 'comment_code';
 			$this->defaultColumns[] = 'title';
 			$this->defaultColumns[] = 'body';
 			$this->defaultColumns[] = 'media';
-			$this->defaultColumns[] = 'comment';
-			$this->defaultColumns[] = 'view';
-			$this->defaultColumns[] = 'likes';
+			$this->defaultColumns[] = 'headline';
+			$this->defaultColumns[] = 'comment_code';
 			$this->defaultColumns[] = 'creation_date';
 			$this->defaultColumns[] = 'creation_id';
 			$this->defaultColumns[] = 'modified_date';
@@ -258,7 +255,12 @@ class Videos extends CActiveRecord
 	/**
 	 * Set default columns to display
 	 */
-	protected function afterConstruct() {
+	protected function afterConstruct() 
+	{
+		$controller = strtolower(Yii::app()->controller->id);
+		$setting = VideoSetting::model()->findByPk(1, array(
+			'select' => 'headline',
+		));
 		if(count($this->defaultColumns) == 0) {
 			/*
 			$this->defaultColumns[] = array(
@@ -283,14 +285,14 @@ class Videos extends CActiveRecord
 			if(!isset($_GET['category'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'cat_id',
-					'value' => 'Phrase::trans($data->cat->name, 2)',
+					'value' => 'Phrase::trans($data->cat->name)',
 					'filter'=> VideoCategory::getCategory(),
 					'type' => 'raw',
 				);
 			}
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
-				'value' => '$data->user->displayname',
+				'value' => '$data->creation->displayname',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
@@ -318,10 +320,10 @@ class Videos extends CActiveRecord
 					),
 				), true),
 			);
-			if(OmmuSettings::getInfo('site_headline') == 1) {
+			if($setting->headline == 1) {
 				$this->defaultColumns[] = array(
 					'name' => 'headline',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("headline",array("id"=>$data->video_id)), $data->headline, 1)',
+					'value' => 'in_array($data->cat_id, VideoSetting::getHeadlineCategory()) ? ($data->headline == 1 ? Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Utility::getPublish(Yii::app()->controller->createUrl("headline",array("id"=>$data->video_id)), $data->headline, 1)) : \'-\'',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
@@ -370,6 +372,39 @@ class Videos extends CActiveRecord
 	/**
 	 * Albums get information
 	 */
+	public static function getHeadline()
+	{
+		$setting = VideoSetting::model()->findByPk(1, array(
+			'select' => 'headline_limit, headline_category',
+		));
+		$headline_category = unserialize($setting->headline_category);
+		if(empty($headline_category))
+			$headline_category = array();
+		
+		$criteria=new CDbCriteria;
+		$criteria->compare('t.publish', 1);
+		$criteria->addInCondition('t.cat_id', $headline_category);
+		$criteria->compare('t.headline', 1);
+		$criteria->order = 't.headline_date DESC';
+		
+		$model = self::model()->findAll($criteria);
+		
+		$headline = array();
+		if(!empty($model)) {
+			$i=0;
+			foreach($model as $key => $val) {
+				$i++;
+				if($i <= $setting->headline_limit)
+					$headline[] = $val->video_id;
+			}
+		}
+		
+		return $headline;
+	}
+
+	/**
+	 * Video get information
+	 */
 	public function searchIndexing($index)
 	{
 		Yii::import('application.modules.video.models.*');
@@ -382,13 +417,13 @@ class Videos extends CActiveRecord
 		foreach($model as $key => $item) {				
 			$doc = new Zend_Search_Lucene_Document();
 			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('id', CHtml::encode($item->video_id), 'utf-8')); 
-			$doc->addField(Zend_Search_Lucene_Field::Keyword('category', CHtml::encode(Phrase::trans($item->cat->name,2)), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::Keyword('category', CHtml::encode(Phrase::trans($item->cat->name)), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::Text('media', CHtml::encode('https://www.youtube.com/watch?v='.$item->media), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::Text('title', CHtml::encode($item->title), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::Text('body', CHtml::encode(Utility::hardDecode(Utility::softDecode($item->body))), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::Text('url', CHtml::encode(Utility::getProtocol().'://'.Yii::app()->request->serverName.Yii::app()->createUrl('video/site/view', array('id'=>$item->video_id,'t'=>Utility::getUrlTitle($item->title)))), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('date', CHtml::encode(Utility::dateFormat($item->creation_date, true).' WIB'), 'utf-8'));
-			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('creation', CHtml::encode($item->user->displayname), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('creation', CHtml::encode($item->creation->displayname), 'utf-8'));
 			$index->addDocument($doc);			
 		}
 		
@@ -402,7 +437,7 @@ class Videos extends CActiveRecord
 		$controller = strtolower(Yii::app()->controller->id);
 		if(parent::beforeValidate()) {
 			if($this->isNewRecord)
-				$this->user_id = Yii::app()->user->id;
+				$this->creation_id = Yii::app()->user->id;
 			else
 				$this->modified_id = Yii::app()->user->id;
 
@@ -416,15 +451,20 @@ class Videos extends CActiveRecord
 	/**
 	 * After save attributes
 	 */
-	protected function afterSave() {
+	protected function afterSave() 
+	{
 		parent::afterSave();
-		if($this->headline == 1) {
-			self::model()->updateAll(array(
-				'headline' => 0,
-			), array(
-				'condition'=> 'video_id != :id',
-				'params'=>array(':id'=>$this->video_id),
-			));
+		$setting = VideoSetting::model()->findByPk(1, array(
+			'select' => 'headline',
+		));
+		
+		// Reset headline
+		if($setting->headline == 1 && $this->headline == 1) {
+			$headline = self::getHeadline();
+			
+			$criteria=new CDbCriteria;
+			$criteria->addNotInCondition('video_id', $headline);
+			self::model()->updateAll(array('headline'=>0), $criteria);
 		}
 	}
 

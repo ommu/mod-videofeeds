@@ -34,21 +34,6 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('user_id'); ?><br/>
-			<?php echo $form->textField($model,'user_id',array('size'=>11,'maxlength'=>11)); ?>
-		</li>
-
-		<li>
-			<?php echo $model->getAttributeLabel('headline'); ?><br/>
-			<?php echo $form->textField($model,'headline'); ?>
-		</li>
-
-		<li>
-			<?php echo $model->getAttributeLabel('comment_code'); ?><br/>
-			<?php echo $form->textField($model,'comment_code'); ?>
-		</li>
-
-		<li>
 			<?php echo $model->getAttributeLabel('title'); ?><br/>
 			<?php echo $form->textField($model,'title',array('size'=>60,'maxlength'=>64)); ?>
 		</li>
@@ -64,18 +49,13 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('comment'); ?><br/>
-			<?php echo $form->textField($model,'comment'); ?>
+			<?php echo $model->getAttributeLabel('headline'); ?><br/>
+			<?php echo $form->textField($model,'headline'); ?>
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('view'); ?><br/>
-			<?php echo $form->textField($model,'view'); ?>
-		</li>
-
-		<li>
-			<?php echo $model->getAttributeLabel('likes'); ?><br/>
-			<?php echo $form->textField($model,'likes'); ?>
+			<?php echo $model->getAttributeLabel('comment_code'); ?><br/>
+			<?php echo $form->textField($model,'comment_code'); ?>
 		</li>
 
 		<li>
