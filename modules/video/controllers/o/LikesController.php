@@ -10,13 +10,16 @@
  * TOC :
  *	Index
  *	Manage
+ *	RunAction
  *	Delete
+ *	Publish
  *
  *	LoadModel
  *	performAjaxValidation
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2017 Ommu Platform (opensource.ommu.co)
+ * @created date 5 May 2017, 16:57 WIB
  * @link https://github.com/ommu/Video-Albums
  * @contact (+62)856-299-4114
  *
@@ -78,7 +81,7 @@ class LikesController extends Controller
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array('manage','delete'),
+				'actions'=>array('manage','runaction','delete','publish'),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level) && in_array(Yii::app()->user->level, array(1,2))',
 			),
@@ -120,8 +123,15 @@ class LikesController extends Controller
 			}
 		}
 		$columns = $model->getGridColumn($columnTemp);
+		
+		if(isset($_GET['video'])) {
+			$video = Videos::model()->findByPk($_GET['video']);
+			$title = ': '.$video->title.' '.Yii::t('phrase', 'by').' '.$video->user->displayname;
+		} else {
+			$title = '';
+		}
 
-		$this->pageTitle = 'Video Likes Manage';
+		$this->pageTitle = Yii::t('phrase', 'Video Likes Manage').$title;
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -131,23 +141,102 @@ class LikesController extends Controller
 	}
 
 	/**
+	 * Displays a particular model.
+	 * @param integer $id the ID of the model to be displayed
+	 */
+	public function actionRunAction() {
+		$id       = $_POST['trash_id'];
+		$criteria = null;
+		$actions  = $_GET['action'];
+
+		if(count($id) > 0) {
+			$criteria = new CDbCriteria;
+			$criteria->addInCondition('id', $id);
+
+			if($actions == 'publish') {
+				VideoLikes::model()->updateAll(array(
+					'publish' => 1,
+				),$criteria);
+			} elseif($actions == 'unpublish') {
+				VideoLikes::model()->updateAll(array(
+					'publish' => 0,
+				),$criteria);
+			} elseif($actions == 'trash') {
+				VideoLikes::model()->updateAll(array(
+					'publish' => 2,
+				),$criteria);
+			} elseif($actions == 'delete') {
+				VideoLikes::model()->deleteAll($criteria);
+			}
+		}
+
+		// if AJAX request (triggered by deletion via admin grid view), we should not redirect the browser
+		if(!isset($_GET['ajax'])) {
+			$this->redirect(isset($_POST['returnUrl']) ? $_POST['returnUrl'] : array('manage'));
+		}
+	}
+
+	/**
 	 * Deletes a particular model.
 	 * If deletion is successful, the browser will be redirected to the 'admin' page.
 	 * @param integer $id the ID of the model to be deleted
 	 */
 	public function actionDelete($id) 
 	{
-		$model=$this->loadModel($id);
-		
 		if(Yii::app()->request->isPostRequest) {
 			// we only allow deletion via POST request
 			if(isset($id)) {
-				if($model->delete()) {
+				$this->loadModel($id)->delete();
+
+				echo CJSON::encode(array(
+					'type' => 5,
+					'get' => Yii::app()->controller->createUrl('manage'),
+					'id' => 'partial-video-likes',
+					'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Likes success deleted.').'</strong></div>',
+				));
+			}
+
+		} else {
+			$this->dialogDetail = true;
+			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+			$this->dialogWidth = 350;
+
+			$this->pageTitle = Yii::t('phrase', 'Delete Likes');
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('admin_delete');
+		}
+	}
+
+	/**
+	 * Deletes a particular model.
+	 * If deletion is successful, the browser will be redirected to the 'admin' page.
+	 * @param integer $id the ID of the model to be deleted
+	 */
+	public function actionPublish($id) 
+	{
+		$model=$this->loadModel($id);
+		
+		if($model->publish == 1) {
+			$title = Yii::t('phrase', 'Unpublish');
+			$replace = 0;
+		} else {
+			$title = Yii::t('phrase', 'Publish');
+			$replace = 1;
+		}
+
+		if(Yii::app()->request->isPostRequest) {
+			// we only allow deletion via POST request
+			if(isset($id)) {
+				//change value active or publish
+				$model->publish = $replace;
+
+				if($model->update()) {
 					echo CJSON::encode(array(
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-video-likes',
-						'msg' => '<div class="errorSummary success"><strong>VideoLikes success deleted.</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'VideoLikes success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -157,10 +246,13 @@ class LikesController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = 'VideoLikes Delete.';
+			$this->pageTitle = $title;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
-			$this->render('admin_delete');
+			$this->render('admin_publish',array(
+				'title'=>$title,
+				'model'=>$model,
+			));
 		}
 	}
 

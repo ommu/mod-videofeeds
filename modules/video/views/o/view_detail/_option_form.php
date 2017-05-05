@@ -1,13 +1,14 @@
 <?php
 /**
- * Video Likes (video-likes)
- * @var $this LikesController
- * @var $model VideoLikes
+ * Video View Details (video-view-detail)
+ * @var $this ViewdetailController
+ * @var $model VideoViewDetail
  * @var $form CActiveForm
+ * version: 0.0.1
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2017 Ommu Platform (opensource.ommu.co)
- * @created date 5 May 2017, 16:57 WIB
+ * @copyright Copyright (c) 2017 Ommu Platform (opensource.ommu.co) 
+ * @created date 5 May 2017, 12:55 WIB
  * @link https://github.com/ommu/Video-Albums
  * @contact (+62)856-299-4114
  *
@@ -33,5 +34,4 @@ foreach($model->metaData->columns as $key => $val) {
 	</li>
 	<?php endforeach; ?>
 </ul>
-<div class="clear"></div>
 <?php echo CHtml::endForm(); ?>
