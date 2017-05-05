@@ -21,8 +21,8 @@
  *
  * The followings are the available columns in table '_view_video_category':
  * @property integer $cat_id
- * @property string $category_name
- * @property string $category_desc
+ * @property string $videos
+ * @property string $video_all
  */
 class ViewVideoCategory extends CActiveRecord
 {
@@ -64,10 +64,10 @@ class ViewVideoCategory extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('cat_id', 'numerical', 'integerOnly'=>true),
-			array('category_name, category_desc', 'safe'),
+			array('videos, video_all', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('cat_id, category_name, category_desc', 'safe', 'on'=>'search'),
+			array('cat_id, videos, video_all', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -88,9 +88,9 @@ class ViewVideoCategory extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'cat_id' => PYii::t('attribute', 'Cat'),
-			'category_name' => PYii::t('attribute', 'Category Name'),
-			'category_desc' => PYii::t('attribute', 'Category Desc'),
+			'cat_id' => Yii::t('attribute', 'Cat'),
+			'videos' => Yii::t('attribute', 'Videos'),
+			'video_all' => Yii::t('attribute', 'Video All'),
 		);
 	}
 
@@ -113,8 +113,8 @@ class ViewVideoCategory extends CActiveRecord
 		$criteria=new CDbCriteria;
 
 		$criteria->compare('t.cat_id',$this->cat_id);
-		$criteria->compare('t.category_name',strtolower($this->category_name),true);
-		$criteria->compare('t.category_desc',strtolower($this->category_desc),true);
+		$criteria->compare('t.videos',$this->videos);
+		$criteria->compare('t.video_all',$this->video_all);
 
 		if(!isset($_GET['ViewVideoCategory_sort']))
 			$criteria->order = 't.cat_id DESC';
@@ -146,8 +146,8 @@ class ViewVideoCategory extends CActiveRecord
 			}
 		} else {
 			$this->defaultColumns[] = 'cat_id';
-			$this->defaultColumns[] = 'category_name';
-			$this->defaultColumns[] = 'category_desc';
+			$this->defaultColumns[] = 'videos';
+			$this->defaultColumns[] = 'video_all';
 		}
 
 		return $this->defaultColumns;
@@ -171,8 +171,8 @@ class ViewVideoCategory extends CActiveRecord
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
 			$this->defaultColumns[] = 'cat_id';
-			$this->defaultColumns[] = 'category_name';
-			$this->defaultColumns[] = 'category_desc';
+			$this->defaultColumns[] = 'videos';
+			$this->defaultColumns[] = 'video_all';
 		}
 		parent::afterConstruct();
 	}

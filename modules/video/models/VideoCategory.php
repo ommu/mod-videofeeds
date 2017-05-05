@@ -22,8 +22,7 @@
  * The followings are the available columns in table 'ommu_video_category':
  * @property integer $cat_id
  * @property integer $publish
- * @property integer $dependency
- * @property integer $orders
+ * @property integer $parent
  * @property string $name
  * @property string $desc
  * @property string $creation_date
@@ -37,13 +36,27 @@
 class VideoCategory extends CActiveRecord
 {
 	public $defaultColumns = array();
-	public $title;
-	public $description;
-	public $count_video;
+	public $title_i;
+	public $description_i;
 	
 	// Variable Search
 	public $creation_search;
 	public $modified_search;
+
+	/**
+	 * Behaviors for this model
+	 */
+	public function behaviors() 
+	{
+		return array(
+			'sluggable' => array(
+				'class'=>'ext.yii-behavior-sluggable.SluggableBehavior',
+				'columns' => array('title.en_us'),
+				'unique' => true,
+				'update' => true,
+			),
+		);
+	}
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -73,18 +86,17 @@ class VideoCategory extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('
-				title, description', 'required'),
-			array('publish, dependency, orders, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
-			array('name, desc,
-				count_video', 'length', 'max'=>11),
+				title_i, description_i', 'required'),
+			array('publish, parent, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('name, desc', 'length', 'max'=>11),
 			array('
-				title', 'length', 'max'=>32),
+				title_i', 'length', 'max'=>32),
 			array('
-				description', 'length', 'max'=>128),
+				description_i', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('cat_id, publish, dependency, orders, name, desc, creation_date, creation_id, modified_date, modified_id,
-				title, description, count_video, creation_search, modified_search', 'safe', 'on'=>'search'),
+			array('cat_id, publish, parent, name, desc, creation_date, creation_id, modified_date, modified_id,
+				title_i, description_i, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -96,10 +108,12 @@ class VideoCategory extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'view_cat' => array(self::BELONGS_TO, 'ViewVideoCategory', 'cat_id'),
+			'view' => array(self::BELONGS_TO, 'ViewVideoCategory', 'cat_id'),
+			'title' => array(self::BELONGS_TO, 'OmmuSystemPhrase', 'name'),
+			'description' => array(self::BELONGS_TO, 'OmmuSystemPhrase', 'desc'),
 			'creation' => array(self::BELONGS_TO, 'Users', 'creation_id'),
 			'modified' => array(self::BELONGS_TO, 'Users', 'modified_id'),
-			'video' => array(self::HAS_MANY, 'Videos', 'cat_id'),
+			'videos' => array(self::HAS_MANY, 'Videos', 'cat_id'),
 		);
 	}
 
@@ -111,17 +125,15 @@ class VideoCategory extends CActiveRecord
 		return array(
 			'cat_id' => Yii::t('attribute', 'Category'),
 			'publish' => Yii::t('attribute', 'Publish'),
-			'dependency' => Yii::t('attribute', 'Parent'),
-			'orders' => Yii::t('attribute', 'Orders'),
+			'parent' => Yii::t('attribute', 'Parent'),
 			'name' => Yii::t('attribute', 'Title'),
 			'desc' => Yii::t('attribute', 'Description'),
 			'creation_date' => Yii::t('attribute', 'Creation Date'),
 			'creation_id' => Yii::t('attribute', 'Creation'),
 			'modified_date' => Yii::t('attribute', 'Modified Date'),
 			'modified_id' => Yii::t('attribute', 'Modified'),
-			'title' => Yii::t('attribute', 'Title'),
-			'description' => Yii::t('attribute', 'Description'),
-			'count_video' => Yii::t('attribute', 'Video'),
+			'title_i' => Yii::t('attribute', 'Title'),
+			'description_i' => Yii::t('attribute', 'Description'),
 			'creation_search' => Yii::t('attribute', 'Creation'),
 			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
@@ -145,6 +157,35 @@ class VideoCategory extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
+		// Custom Search
+		$defaultLang = OmmuLanguages::getDefault('code');
+		if(isset(Yii::app()->session['language']))
+			$language = Yii::app()->session['language'];
+		else 
+			$language = $defaultLang;
+		
+		$criteria->with = array(
+			'view' => array(
+				'alias'=>'view',
+			),
+			'title' => array(
+				'alias'=>'title',
+				'select'=>$language,
+			),
+			'description' => array(
+				'alias'=>'description',
+				'select'=>$language,
+			),
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
+
 		$criteria->compare('t.cat_id',$this->cat_id);
 		if(isset($_GET['type']) && $_GET['type'] == 'publish') {
 			$criteria->compare('t.publish',1);
@@ -156,35 +197,24 @@ class VideoCategory extends CActiveRecord
 			$criteria->addInCondition('t.publish',array(0,1));
 			$criteria->compare('t.publish',$this->publish);
 		}
-		$criteria->compare('t.dependency',$this->dependency);
-		$criteria->compare('t.orders',$this->orders);
+		$criteria->compare('t.parent',$this->parent);
 		$criteria->compare('t.name',$this->name,true);
 		$criteria->compare('t.desc',$this->desc,true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
-		$criteria->compare('t.creation_id',$this->creation_id);
+		if(isset($_GET['creation']))
+			$criteria->compare('t.creation_id',$_GET['creation']);
+		else
+			$criteria->compare('t.creation_id',$this->creation_id);
 		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
-		$criteria->compare('t.modified_id',$this->modified_id);
-		$criteria->compare('t.count_video',$this->count_video);
-
-		// Custom Search
-		$criteria->with = array(
-			'view_cat' => array(
-				'alias'=>'view_cat',
-				'select'=>'category_name, category_desc'
-			),
-			'creation' => array(
-				'alias'=>'creation',
-				'select'=>'displayname'
-			),
-			'modified' => array(
-				'alias'=>'modified',
-				'select'=>'displayname'
-			),
-		);
-		$criteria->compare('view_cat.category_name',strtolower($this->title), true);
-		$criteria->compare('view_cat.category_desc',strtolower($this->description), true);
+		if(isset($_GET['modified']))
+			$criteria->compare('t.modified_id',$_GET['modified']);
+		else
+			$criteria->compare('t.modified_id',$this->modified_id);
+		
+		$criteria->compare('title.'.$language,strtolower($this->title_i), true);
+		$criteria->compare('description.'.$language,strtolower($this->description_i), true);
 		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
 		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
@@ -219,8 +249,7 @@ class VideoCategory extends CActiveRecord
 		} else {
 			//$this->defaultColumns[] = 'cat_id';
 			$this->defaultColumns[] = 'publish';
-			$this->defaultColumns[] = 'dependency';
-			$this->defaultColumns[] = 'orders';
+			$this->defaultColumns[] = 'parent';
 			$this->defaultColumns[] = 'name';
 			$this->defaultColumns[] = 'desc';
 			$this->defaultColumns[] = 'creation_date';
@@ -251,21 +280,16 @@ class VideoCategory extends CActiveRecord
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'title',
-				'value' => 'Phrase::trans($data->name, 2)',
+				'name' => 'title_i',
+				'value' => 'Phrase::trans($data->name)',
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'description',
-				'value' => 'Phrase::trans($data->desc, 2)',
+				'name' => 'description_i',
+				'value' => 'Phrase::trans($data->desc)',
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'dependency',
-				'value' => '$data->dependency != 0 ? Phrase::trans(VideoCategory::model()->findByPk($data->dependency)->name, 2) : "-"',
-			);
-			$this->defaultColumns[] = array(
-				'header' => 'count_video',
-				'value' => 'CHtml::link($data->count_video." ".Yii::t(\'attribute\', \'Video\'), Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
-				'type' => 'raw',
+				'name' => 'parent',
+				'value' => '$data->parent != 0 ? Phrase::trans(VideoCategory::model()->findByPk($data->parent)->name) : "-"',
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
@@ -337,51 +361,26 @@ class VideoCategory extends CActiveRecord
 	 * 0 = unpublish
 	 * 1 = publish
 	 */
-	public static function getCategory($publish=null) {
-		if($publish == null) {
-			$model = self::model()->findAll();
-		} else {
-			$model = self::model()->findAll(array(
-				//'select' => 'publish, name',
-				'condition' => 'publish = :publish',
-				'params' => array(
-					':publish' => $publish,
-				),
-				//'order' => 'cat_id ASC'
-			));
-		}
-
-		$items = array();
-		if($model != null) {
-			foreach($model as $key => $val) {
-				$items[$val->cat_id] = Phrase::trans($val->name, 2);
-			}
-			return $items;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Get Video
-	 */
-	public static function getVideo($id, $type=null) {
+	public static function getCategory($publish=null, $type=null) 
+	{
 		$criteria=new CDbCriteria;
-		$criteria->compare('cat_id',$id);
+		if($publish != null)
+			$criteria->compare('t.publish',$publish);
+		
+		$model = self::model()->findAll($criteria);		
 
 		if($type == null) {
-			//$criteria->select = '';
-			$model = Videos::model()->findAll($criteria);
-		} else {
-			$model = Videos::model()->count($criteria);
-		}
-
-		return $model;
-	}
-
-	protected function afterFind() {
-		$this->count_video = self::getVideo($this->cat_id, 'count');
-		parent::afterFind();
+			$items = array();
+			if($model != null) {
+				foreach($model as $key => $val) {
+					$items[$val->cat_id] = Phrase::trans($val->name);
+				}
+				return $items;
+			} else
+				return false;
+			
+		} else if($type == 'data')
+			return $model;
 	}
 
 	/**
@@ -389,10 +388,9 @@ class VideoCategory extends CActiveRecord
 	 */
 	protected function beforeValidate() {
 		if(parent::beforeValidate()) {
-			if($this->isNewRecord) {
-				$this->orders = 0;
-				$this->user_id = Yii::app()->user->id;
-			} else
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;
+			else
 				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
@@ -401,29 +399,34 @@ class VideoCategory extends CActiveRecord
 	/**
 	 * before save attributes
 	 */
-	protected function beforeSave() {
+	protected function beforeSave() 
+	{
+		$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
+		$location = Utility::getUrlTitle($currentAction);
+		
 		if(parent::beforeSave()) {
 			if($this->isNewRecord) {
-				$location = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
 				$title=new OmmuSystemPhrase;
 				$title->location = $location.'_title';
-				$title->en_us = $this->title;
+				$title->en_us = $this->title_i;
 				if($title->save())
 					$this->name = $title->phrase_id;
 
 				$desc=new OmmuSystemPhrase;
 				$desc->location = $location.'_description';
-				$desc->en_us = $this->description;
+				$desc->en_us = $this->description_i;
 				if($desc->save())
 					$this->desc = $desc->phrase_id;
 				
+				$this->slug = Utility::getUrlTitle($this->title_i);	
+				
 			} else {
 				$title = OmmuSystemPhrase::model()->findByPk($this->name);
-				$title->en_us = $this->title;
+				$title->en_us = $this->title_i;
 				$title->save();
 
 				$desc = OmmuSystemPhrase::model()->findByPk($this->desc);
-				$desc->en_us = $this->description;
+				$desc->en_us = $this->description_i;
 				$desc->save();
 			}
 		}

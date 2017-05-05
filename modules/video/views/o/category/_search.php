@@ -29,13 +29,8 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('dependency'); ?><br/>
-			<?php echo $form->textField($model,'dependency'); ?>
-		</li>
-
-		<li>
-			<?php echo $model->getAttributeLabel('orders'); ?><br/>
-			<?php echo $form->textField($model,'orders'); ?>
+			<?php echo $model->getAttributeLabel('parent'); ?><br/>
+			<?php echo $form->textField($model,'parent'); ?>
 		</li>
 
 		<li>
