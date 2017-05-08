@@ -417,7 +417,7 @@ class Videos extends CActiveRecord
 			$doc->addField(Zend_Search_Lucene_Field::Text('media', CHtml::encode('https://www.youtube.com/watch?v='.$item->media), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::Text('title', CHtml::encode($item->title), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::Text('body', CHtml::encode(Utility::hardDecode(Utility::softDecode($item->body))), 'utf-8'));
-			$doc->addField(Zend_Search_Lucene_Field::Text('url', CHtml::encode(Utility::getProtocol().'://'.Yii::app()->request->serverName.Yii::app()->createUrl('video/site/view', array('id'=>$item->video_id,'t'=>Utility::getUrlTitle($item->title)))), 'utf-8'));
+			$doc->addField(Zend_Search_Lucene_Field::Text('url', CHtml::encode(Utility::getProtocol().'://'.Yii::app()->request->serverName.Yii::app()->createUrl('video/site/view', array('id'=>$item->video_id,'slug'=>Utility::getUrlTitle($item->title)))), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('date', CHtml::encode(Utility::dateFormat($item->creation_date, true).' WIB'), 'utf-8'));
 			$doc->addField(Zend_Search_Lucene_Field::UnIndexed('creation', CHtml::encode($item->creation->displayname), 'utf-8'));
 			$index->addDocument($doc);			
