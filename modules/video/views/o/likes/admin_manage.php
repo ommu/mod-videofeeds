@@ -3,6 +3,7 @@
  * Video Likes (video-likes)
  * @var $this LikesController
  * @var $model VideoLikes
+ * version: 0.0.1
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @copyright Copyright (c) 2017 Ommu Platform (opensource.ommu.co)
