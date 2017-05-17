@@ -380,10 +380,10 @@ class Videos extends CActiveRecord
 			$headline_category = array();
 		
 		$criteria=new CDbCriteria;
-		$criteria->compare('t.publish', 1);
-		$criteria->addInCondition('t.cat_id', $headline_category);
-		$criteria->compare('t.headline', 1);
-		$criteria->order = 't.headline_date DESC';
+		$criteria->compare('publish', 1);
+		$criteria->addInCondition('cat_id', $headline_category);
+		$criteria->compare('headline', 1);
+		$criteria->order = 'headline_date DESC';
 		
 		$model = self::model()->findAll($criteria);
 		
@@ -408,7 +408,7 @@ class Videos extends CActiveRecord
 		Yii::import('application.modules.video.models.*');
 		
 		$criteria=new CDbCriteria;
-		$criteria->compare('t.publish', 1);
+		$criteria->compare('publish', 1);
 		$criteria->order = 'video_id DESC';
 		//$criteria->limit = 10;
 		$model = Videos::model()->findAll($criteria);

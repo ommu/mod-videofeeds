@@ -407,18 +407,12 @@ class VideoCategory extends CActiveRecord
 		$location = Utility::getUrlTitle($currentAction);
 		
 		if(parent::beforeSave()) {
-			if($this->isNewRecord) {
+			if($this->isNewRecord || (!$this->isNewRecord && $this->name == 0)) {
 				$title=new OmmuSystemPhrase;
 				$title->location = $location.'_title';
 				$title->en_us = $this->title_i;
 				if($title->save())
 					$this->name = $title->phrase_id;
-
-				$desc=new OmmuSystemPhrase;
-				$desc->location = $location.'_description';
-				$desc->en_us = $this->description_i;
-				if($desc->save())
-					$this->desc = $desc->phrase_id;
 				
 				$this->slug = Utility::getUrlTitle($this->title_i);	
 				
@@ -426,7 +420,16 @@ class VideoCategory extends CActiveRecord
 				$title = OmmuSystemPhrase::model()->findByPk($this->name);
 				$title->en_us = $this->title_i;
 				$title->save();
-
+			}
+			
+			if($this->isNewRecord || (!$this->isNewRecord && $this->desc == 0)) {
+				$desc=new OmmuSystemPhrase;
+				$desc->location = $location.'_description';
+				$desc->en_us = $this->description_i;
+				if($desc->save())
+					$this->desc = $desc->phrase_id;
+				
+			} else {
 				$desc = OmmuSystemPhrase::model()->findByPk($this->desc);
 				$desc->en_us = $this->description_i;
 				$desc->save();
