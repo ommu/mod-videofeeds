@@ -108,8 +108,14 @@ class AdminController extends Controller
 	/**
 	 * Manages all models.
 	 */
-	public function actionManage() 
+	public function actionManage($category=null) 
 	{
+		$pageTitle = Yii::t('phrase', 'Video Feeders');
+		if($category != null) {
+			$data = VideoCategory::model()->findByPk($category);
+			$pageTitle = Yii::t('phrase', 'Video Feeders: Category {category_name}', array ('{category_name}'=>Phrase::trans($data->name)));
+		}
+		
 		$model=new Videos('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['Videos'])) {
@@ -126,7 +132,7 @@ class AdminController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Yii::t('phrase', 'Manage Video Feeder');
+		$this->pageTitle = $pageTitle;
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -142,6 +148,9 @@ class AdminController extends Controller
 	public function actionAdd() 
 	{
 		$model=new Videos;
+		$setting = VideoSetting::model()->findByPk(1,array(
+			'select' => 'headline',
+		));
 
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
@@ -167,21 +176,20 @@ class AdminController extends Controller
 					}
 				}
 			}
-			Yii::app()->end();
-			
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 600;
-			
-			$this->pageTitle = Yii::t('phrase', 'Create Video Feeder');
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_add',array(
-				'model'=>$model,
-			));
-			
+			Yii::app()->end();			
 		}
+		
+		$this->dialogDetail = true;
+		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+		$this->dialogWidth = 600;
+		
+		$this->pageTitle = Yii::t('phrase', 'Create Video Feeder');
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('admin_add',array(
+			'model'=>$model,
+			'setting'=>$setting,
+		));
 	}
 
 	/**
@@ -192,6 +200,9 @@ class AdminController extends Controller
 	public function actionEdit($id) 
 	{
 		$model=$this->loadModel($id);
+		$setting = VideoSetting::model()->findByPk(1,array(
+			'select' => 'headline',
+		));
 
 		// Uncomment the following line if AJAX validation is needed
 		$this->performAjaxValidation($model);
@@ -217,20 +228,20 @@ class AdminController extends Controller
 					}
 				}
 			}
-			Yii::app()->end();
-			
-		} else {
-			$this->dialogDetail = true;
-			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
-			$this->dialogWidth = 600;
-			
-			$this->pageTitle = Yii::t('phrase', 'Update Video Feeder ').': '.$model->title;
-			$this->pageDescription = '';
-			$this->pageMeta = '';
-			$this->render('admin_edit',array(
-				'model'=>$model,
-			));			
+			Yii::app()->end();			
 		}
+		
+		$this->dialogDetail = true;
+		$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
+		$this->dialogWidth = 600;
+		
+		$this->pageTitle = Yii::t('phrase', 'Update Video Feeder: $video_title', array('$video_title'=>$model->title));
+		$this->pageDescription = '';
+		$this->pageMeta = '';
+		$this->render('admin_edit',array(
+			'model'=>$model,
+			'setting'=>$setting,
+		));
 	}
 
 	/**
@@ -296,7 +307,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Yii::t('phrase', 'Delete Video Feeder ');
+			$this->pageTitle = Yii::t('phrase', 'Delete Video Feeder: $video_title', array('$video_title'=>$model->title));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -319,6 +330,7 @@ class AdminController extends Controller
 			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
+		$pageTitle = Yii::t('phrase', '{title} Video Feeder: $video_title', array('{title}'=>$title, '$video_title'=>$model->title));
 
 		if(Yii::app()->request->isPostRequest) {
 			// we only allow deletion via POST request
@@ -341,7 +353,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = $title;
+			$this->pageTitle = $pageTitle;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_publish',array(
@@ -372,7 +384,7 @@ class AdminController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-videos',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', '24005').'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video feeder success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -382,7 +394,7 @@ class AdminController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Yii::t('phrase', 'Headline');
+			$this->pageTitle = Yii::t('phrase', 'Headline Video Feeder: $video_title', array('$video_title'=>$model->title));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_headline');

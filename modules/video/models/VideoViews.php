@@ -37,6 +37,7 @@ class VideoViews extends CActiveRecord
 	public $defaultColumns = array();
 	
 	// Variable Search
+	public $category_search;
 	public $video_search;
 	public $user_search;
 
@@ -75,7 +76,7 @@ class VideoViews extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('view_id, publish, video_id, user_id, views, view_date, view_ip, deleted_date,
-				video_search, user_search', 'safe', 'on'=>'search'),
+				category_search, video_search, user_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -106,6 +107,7 @@ class VideoViews extends CActiveRecord
 			'view_date' => Yii::t('attribute', 'View Date'),
 			'view_ip' => Yii::t('attribute', 'View Ip'),
 			'deleted_date' => Yii::t('attribute', 'Deleted Date'),
+			'category_search' => Yii::t('attribute', 'Category'),
 			'video_search' => Yii::t('attribute', 'Video'),
 			'user_search' => Yii::t('attribute', 'User'),
 		);
@@ -144,7 +146,7 @@ class VideoViews extends CActiveRecord
 		$criteria->with = array(
 			'video' => array(
 				'alias'=>'video',
-				'select'=>'publish, title'
+				'select'=>'publish, cat_id, title'
 			),
 			'user' => array(
 				'alias'=>'user',
@@ -152,7 +154,7 @@ class VideoViews extends CActiveRecord
 			),
 		);
 
-		$criteria->compare('t.view_id',strtolower($this->view_id),true);
+		$criteria->compare('t.view_id',$this->view_id);
 		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
 		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
@@ -178,10 +180,11 @@ class VideoViews extends CActiveRecord
 		if($this->deleted_date != null && !in_array($this->deleted_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.deleted_date)',date('Y-m-d', strtotime($this->deleted_date)));
 		
-		$criteria->compare('video.title',strtolower($this->video_search), true);
+		$criteria->compare('video.cat_id',$this->category_search);
+		$criteria->compare('video.title',strtolower($this->video_search),true);
 		if(isset($_GET['video']) && isset($_GET['publish']))
 			$criteria->compare('video.publish',$_GET['publish']);
-		$criteria->compare('user.displayname',strtolower($this->user_search), true);
+		$criteria->compare('user.displayname',strtolower($this->user_search),true);
 
 		if(!isset($_GET['VideoViews_sort']))
 			$criteria->order = 't.view_id DESC';
@@ -244,6 +247,12 @@ class VideoViews extends CActiveRecord
 			);
 			if(!isset($_GET['video'])) {
 				$this->defaultColumns[] = array(
+					'name' => 'category_search',
+					'value' => 'Phrase::trans($data->video->cat->name)',
+					'filter'=> VideoCategory::getCategory(),
+					'type' => 'raw',
+				);
+				$this->defaultColumns[] = array(
 					'name' => 'video_search',
 					'value' => '$data->video->title',
 				);
@@ -294,32 +303,6 @@ class VideoViews extends CActiveRecord
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
-			);
-			$this->defaultColumns[] = array(
-				'name' => 'deleted_date',
-				'value' => 'Utility::dateFormat($data->deleted_date)',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
-				'filter' => Yii::app()->controller->widget('application.components.system.CJuiDatePicker', array(
-					'model'=>$this,
-					'attribute'=>'deleted_date',
-					'language' => 'en',
-					'i18nScriptFile' => 'jquery-ui-i18n.min.js',
-					//'mode'=>'datetime',
-					'htmlOptions' => array(
-						'id' => 'deleted_date_filter',
-					),
-					'options'=>array(
-						'showOn' => 'focus',
-						'dateFormat' => 'dd-mm-yy',
-						'showOtherMonths' => true,
-						'selectOtherMonths' => true,
-						'changeMonth' => true,
-						'changeYear' => true,
-						'showButtonPanel' => true,
-					),
-				), true),
 			);
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(

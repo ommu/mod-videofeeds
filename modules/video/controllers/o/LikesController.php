@@ -106,8 +106,14 @@ class LikesController extends Controller
 	/**
 	 * Manages all models.
 	 */
-	public function actionManage() 
+	public function actionManage($video=null) 
 	{
+		$pageTitle = Yii::t('phrase', 'Video Views');
+		if($video != null) {
+			$data = Videos::model()->findByPk($video);
+			$pageTitle = Yii::t('phrase', 'Video Views: $video_title from category $category_name', array ('$video_title'=>$data->title, '$category_name'=>Phrase::trans($data->cat->name)));
+		}
+		
 		$model=new VideoLikes('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['VideoLikes'])) {
@@ -123,15 +129,8 @@ class LikesController extends Controller
 			}
 		}
 		$columns = $model->getGridColumn($columnTemp);
-		
-		if(isset($_GET['video'])) {
-			$video = Videos::model()->findByPk($_GET['video']);
-			$title = ': '.$video->title.' '.Yii::t('phrase', 'by').' '.$video->user->displayname;
-		} else {
-			$title = '';
-		}
 
-		$this->pageTitle = Yii::t('phrase', 'Video Likes Manage').$title;
+		$this->pageTitle = $pageTitle;
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -183,16 +182,16 @@ class LikesController extends Controller
 	 */
 	public function actionDelete($id) 
 	{
+		$model=$this->loadModel($id);
+		
 		if(Yii::app()->request->isPostRequest) {
 			// we only allow deletion via POST request
-			if(isset($id)) {
-				$this->loadModel($id)->delete();
-
+			if($model->delete()) {
 				echo CJSON::encode(array(
 					'type' => 5,
 					'get' => Yii::app()->controller->createUrl('manage'),
 					'id' => 'partial-video-likes',
-					'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Likes success deleted.').'</strong></div>',
+					'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video likes success deleted.').'</strong></div>',
 				));
 			}
 
@@ -201,7 +200,7 @@ class LikesController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Yii::t('phrase', 'Delete Likes');
+			$this->pageTitle = Yii::t('phrase', 'Delete Likes: $video_title', array('$video_title'=>$model->video->title));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -224,6 +223,7 @@ class LikesController extends Controller
 			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
+		$pageTitle = Yii::t('phrase', '$title Likes: $video_title', array('$title'=>$title, '$video_title'=>$model->video->title));
 
 		if(Yii::app()->request->isPostRequest) {
 			// we only allow deletion via POST request
@@ -236,7 +236,7 @@ class LikesController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-video-likes',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'VideoLikes success updated.').'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video likes success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -246,7 +246,7 @@ class LikesController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = $title;
+			$this->pageTitle = $pageTitle;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_publish',array(

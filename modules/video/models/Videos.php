@@ -46,6 +46,8 @@ class Videos extends CActiveRecord
 	// Variable Search
 	public $creation_search;
 	public $modified_search;
+	public $view_search;
+	public $like_search;
 
 	/**
 	 * Behaviors for this model
@@ -97,7 +99,7 @@ class Videos extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('video_id, publish, cat_id, title, body, media, headline, comment_code, creation_date, creation_id, modified_date, modified_id,
-				creation_search, modified_search', 'safe', 'on'=>'search'),
+				creation_search, modified_search, view_search, like_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -129,7 +131,7 @@ class Videos extends CActiveRecord
 			'cat_id' => Yii::t('attribute', 'Category'),
 			'title' => Yii::t('attribute', 'Title'),
 			'body' => Yii::t('attribute', 'Description'),
-			'media' => Yii::t('attribute', 'Description'),
+			'media' => Yii::t('attribute', 'ID Video'),
 			'headline' => Yii::t('attribute', 'Headline'),
 			'comment_code' => Yii::t('attribute', 'Comment'),
 			'creation_date' => Yii::t('attribute', 'Creation Date'),
@@ -138,6 +140,8 @@ class Videos extends CActiveRecord
 			'modified_id' => Yii::t('attribute', 'Modified'),
 			'creation_search' => Yii::t('attribute', 'Creation'),
 			'modified_search' => Yii::t('attribute', 'Modified'),
+			'view_search' => Yii::t('attribute', 'Views'),
+			'like_search' => Yii::t('attribute', 'Likes'),
 		);
 	}
 
@@ -161,6 +165,9 @@ class Videos extends CActiveRecord
 
 		// Custom Search
 		$criteria->with = array(
+			'view' => array(
+				'alias'=>'view',
+			),
 			'creation' => array(
 				'alias'=>'creation',
 				'select'=>'displayname'
@@ -171,7 +178,7 @@ class Videos extends CActiveRecord
 			),
 		);
 
-		$criteria->compare('t.video_id',$this->video_id,true);
+		$criteria->compare('t.video_id',$this->video_id);
 		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
 		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
@@ -186,9 +193,9 @@ class Videos extends CActiveRecord
 			$criteria->compare('t.cat_id',$_GET['category']);
 		else
 			$criteria->compare('t.cat_id',$this->cat_id);
-		$criteria->compare('t.title',$this->title,true);
-		$criteria->compare('t.body',$this->body,true);
-		$criteria->compare('t.media',$this->media,true);
+		$criteria->compare('t.title',strtolower($this->title),true);
+		$criteria->compare('t.body',strtolower($this->body),true);
+		$criteria->compare('t.media',strtolower($this->media),true);
 		$criteria->compare('t.headline',$this->headline);
 		$criteria->compare('t.comment_code',$this->comment_code);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
@@ -204,8 +211,10 @@ class Videos extends CActiveRecord
 		else
 			$criteria->compare('t.modified_id',$this->modified_id);
 		
-		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
-		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search),true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search),true);
+		$criteria->compare('view.views',$this->view_search);
+		$criteria->compare('view.likes',$this->like_search);
 
 		if(!isset($_GET['Videos_sort']))
 			$criteria->order = 't.video_id DESC';
@@ -318,6 +327,24 @@ class Videos extends CActiveRecord
 					),
 				), true),
 			);
+			$this->defaultColumns[] = array(
+				'name' => 'view_search',
+				'value' => 'CHtml::link($data->view->views ? $data->view->views : 0, Yii::app()->controller->createUrl("o/views/manage",array(\'video\'=>$data->video_id)))',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'type' => 'raw',
+			);
+			if(OmmuSettings::getInfo('site_type') == '1') {
+				$this->defaultColumns[] = array(
+					'name' => 'like_search',
+					'value' => 'CHtml::link($data->view->likes ? $data->view->likes : 0, Yii::app()->controller->createUrl("o/likes/manage",array(\'video\'=>$data->video_id)))',
+					'htmlOptions' => array(
+						'class' => 'center',
+					),
+					'type' => 'raw',
+				);
+			}
 			if($setting->headline == 1) {
 				$this->defaultColumns[] = array(
 					'name' => 'headline',

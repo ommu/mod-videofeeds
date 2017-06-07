@@ -128,11 +128,11 @@ class ViewVideoLikes extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.like_id',strtolower($this->like_id),true);
-		$criteria->compare('t.video_id',strtolower($this->video_id),true);
-		$criteria->compare('t.likes',strtolower($this->likes),true);
-		$criteria->compare('t.unlikes',strtolower($this->unlikes),true);
-		$criteria->compare('t.like_all',strtolower($this->like_all),true);
+		$criteria->compare('t.like_id',$this->like_id);
+		$criteria->compare('t.video_id',$this->video_id);
+		$criteria->compare('t.likes',$this->likes);
+		$criteria->compare('t.unlikes',$this->unlikes);
+		$criteria->compare('t.like_all',$this->like_all);
 
 		if(!isset($_GET['ViewVideoLikes_sort']))
 			$criteria->order = 't.like_id DESC';

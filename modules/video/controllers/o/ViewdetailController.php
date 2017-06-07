@@ -103,8 +103,16 @@ class ViewdetailController extends Controller
 	/**
 	 * Manages all models.
 	 */
-	public function actionManage() 
+	public function actionManage($view=null) 
 	{
+		$pageTitle = Yii::t('phrase', 'Video Views Data');
+		if($view != null) {
+			$data = VideoViews::model()->findByPk($view);
+			$pageTitle = Yii::t('phrase', 'Video Views Data: $video_title from category $category_name - user Guest', array ('$video_title'=>$data->video->title, '$category_name'=>Phrase::trans($data->video->cat->name)));	
+			if($data->user->displayname)
+				$pageTitle = Yii::t('phrase', 'Video Views Data: $video_title from category $category_name - user {user_displayname}', array ('$video_title'=>$data->video->title, '$category_name'=>Phrase::trans($data->video->cat->name), '{user_displayname}'=>$data->user->displayname));
+		}
+		
 		$model=new VideoViewDetail('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['VideoViewDetail'])) {
@@ -121,7 +129,7 @@ class ViewdetailController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Yii::t('phrase', 'Video View Details Manage');
+		$this->pageTitle = $pageTitle;
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('/o/view_detail/admin_manage',array(

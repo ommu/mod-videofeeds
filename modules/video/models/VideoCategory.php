@@ -24,7 +24,6 @@
  * The followings are the available columns in table 'ommu_video_category':
  * @property integer $cat_id
  * @property integer $publish
- * @property integer $parent
  * @property string $name
  * @property string $desc
  * @property string $creation_date
@@ -44,6 +43,7 @@ class VideoCategory extends CActiveRecord
 	// Variable Search
 	public $creation_search;
 	public $modified_search;
+	public $video_search;
 
 	/**
 	 * Behaviors for this model
@@ -89,7 +89,7 @@ class VideoCategory extends CActiveRecord
 		return array(
 			array('
 				title_i, description_i', 'required'),
-			array('publish, parent, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('publish, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('name, desc', 'length', 'max'=>11),
 			array('
 				title_i', 'length', 'max'=>32),
@@ -97,8 +97,8 @@ class VideoCategory extends CActiveRecord
 				description_i', 'length', 'max'=>128),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('cat_id, publish, parent, name, desc, creation_date, creation_id, modified_date, modified_id,
-				title_i, description_i, creation_search, modified_search', 'safe', 'on'=>'search'),
+			array('cat_id, publish, name, desc, creation_date, creation_id, modified_date, modified_id,
+				title_i, description_i, creation_search, modified_search, video_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -127,7 +127,6 @@ class VideoCategory extends CActiveRecord
 		return array(
 			'cat_id' => Yii::t('attribute', 'Category'),
 			'publish' => Yii::t('attribute', 'Publish'),
-			'parent' => Yii::t('attribute', 'Parent'),
 			'name' => Yii::t('attribute', 'Title'),
 			'desc' => Yii::t('attribute', 'Description'),
 			'creation_date' => Yii::t('attribute', 'Creation Date'),
@@ -138,6 +137,7 @@ class VideoCategory extends CActiveRecord
 			'description_i' => Yii::t('attribute', 'Description'),
 			'creation_search' => Yii::t('attribute', 'Creation'),
 			'modified_search' => Yii::t('attribute', 'Modified'),
+			'video_search' => Yii::t('attribute', 'Videos'),
 		);
 	}
 
@@ -199,9 +199,8 @@ class VideoCategory extends CActiveRecord
 			$criteria->addInCondition('t.publish',array(0,1));
 			$criteria->compare('t.publish',$this->publish);
 		}
-		$criteria->compare('t.parent',$this->parent);
-		$criteria->compare('t.name',$this->name,true);
-		$criteria->compare('t.desc',$this->desc,true);
+		$criteria->compare('t.name',$this->name);
+		$criteria->compare('t.desc',$this->desc);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
 		if(isset($_GET['creation']))
@@ -215,10 +214,11 @@ class VideoCategory extends CActiveRecord
 		else
 			$criteria->compare('t.modified_id',$this->modified_id);
 		
-		$criteria->compare('title.'.$language,strtolower($this->title_i), true);
-		$criteria->compare('description.'.$language,strtolower($this->description_i), true);
-		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
-		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
+		$criteria->compare('title.'.$language,strtolower($this->title_i),true);
+		$criteria->compare('description.'.$language,strtolower($this->description_i),true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search),true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search),true);
+		$criteria->compare('view.videos',$this->video_search);
 
 		if(!isset($_GET['VideoCategory_sort']))
 			$criteria->order = 't.cat_id DESC';
@@ -251,7 +251,6 @@ class VideoCategory extends CActiveRecord
 		} else {
 			//$this->defaultColumns[] = 'cat_id';
 			$this->defaultColumns[] = 'publish';
-			$this->defaultColumns[] = 'parent';
 			$this->defaultColumns[] = 'name';
 			$this->defaultColumns[] = 'desc';
 			$this->defaultColumns[] = 'creation_date';
@@ -290,10 +289,6 @@ class VideoCategory extends CActiveRecord
 				'value' => 'Phrase::trans($data->desc)',
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'parent',
-				'value' => '$data->parent != 0 ? Phrase::trans(VideoCategory::model()->findByPk($data->parent)->name) : "-"',
-			);
-			$this->defaultColumns[] = array(
 				'name' => 'creation_search',
 				'value' => '$data->creation->displayname',
 			);
@@ -322,6 +317,14 @@ class VideoCategory extends CActiveRecord
 						'showButtonPanel' => true,
 					),
 				), true),
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'video_search',
+				'value' => 'CHtml::link($data->view->videos ? $data->view->videos : 0, Yii::app()->controller->createUrl("o/admin/manage",array("category"=>$data->cat_id)))',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'type' => 'raw',
 			);
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(
@@ -403,8 +406,8 @@ class VideoCategory extends CActiveRecord
 	 */
 	protected function beforeSave() 
 	{
-		$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
-		$location = Utility::getUrlTitle($currentAction);
+		$currentModule = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
+		$location = Utility::getUrlTitle($currentModule);
 		
 		if(parent::beforeSave()) {
 			if($this->isNewRecord || (!$this->isNewRecord && $this->name == 0)) {

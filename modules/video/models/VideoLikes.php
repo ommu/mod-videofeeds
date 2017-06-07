@@ -38,10 +38,11 @@ class VideoLikes extends CActiveRecord
 	public $defaultColumns = array();
 	
 	// Variable Search
-	public $like_search;
-	public $unlike_search;
+	public $category_search;
 	public $video_search;
 	public $user_search;
+	public $like_search;
+	public $unlike_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -78,7 +79,7 @@ class VideoLikes extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('like_id, publish, video_id, user_id, likes_date, likes_ip, updated_date,
-				like_search, unlike_search, video_search, user_search', 'safe', 'on'=>'search'),
+				category_search, video_search, user_search, like_search, unlike_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -109,10 +110,11 @@ class VideoLikes extends CActiveRecord
 			'likes_date' => Yii::t('attribute', 'Likes Date'),
 			'likes_ip' => Yii::t('attribute', 'Likes Ip'),
 			'updated_date' => Yii::t('attribute', 'Updated Date'),
-			'like_search' => Yii::t('attribute', 'Like'),
-			'unlike_search' => Yii::t('attribute', 'Unlike'),
+			'category_search' => Yii::t('attribute', 'Category'),
 			'video_search' => Yii::t('attribute', 'Video'),
 			'user_search' => Yii::t('attribute', 'User'),
+			'like_search' => Yii::t('attribute', 'Like'),
+			'unlike_search' => Yii::t('attribute', 'Unlike'),
 		);
 	}
 
@@ -141,7 +143,7 @@ class VideoLikes extends CActiveRecord
 			),
 			'video' => array(
 				'alias'=>'video',
-				'select'=>'title'
+				'select'=>'publish, cat_id, title'
 			),
 			'user' => array(
 				'alias'=>'user',
@@ -149,7 +151,7 @@ class VideoLikes extends CActiveRecord
 			),
 		);
 
-		$criteria->compare('t.like_id',$this->like_id,true);
+		$criteria->compare('t.like_id',$this->like_id);
 		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
 		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
@@ -174,10 +176,13 @@ class VideoLikes extends CActiveRecord
 		if($this->updated_date != null && !in_array($this->updated_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.updated_date)',date('Y-m-d', strtotime($this->updated_date)));
 		
+		$criteria->compare('video.cat_id',$this->category_search);
+		$criteria->compare('video.title',strtolower($this->video_search),true);
+		if(isset($_GET['video']) && isset($_GET['publish']))
+			$criteria->compare('video.publish',$_GET['publish']);
+		$criteria->compare('user.displayname',strtolower($this->user_search),true);
 		$criteria->compare('view.likes',$this->like_search);
 		$criteria->compare('view.unlikes',$this->unlike_search);
-		$criteria->compare('video.title',strtolower($this->video_search), true);
-		$criteria->compare('user.displayname',strtolower($this->user_search), true);
 
 		if(!isset($_GET['VideoLikes_sort']))
 			$criteria->order = 't.like_id DESC';
@@ -239,6 +244,12 @@ class VideoLikes extends CActiveRecord
 			);
 			if(!isset($_GET['video'])) {
 				$this->defaultColumns[] = array(
+					'name' => 'category_search',
+					'value' => 'Phrase::trans($data->video->cat->name)',
+					'filter'=> VideoCategory::getCategory(),
+					'type' => 'raw',
+				);
+				$this->defaultColumns[] = array(
 					'name' => 'video_search',
 					'value' => '$data->video->title',
 				);
@@ -249,22 +260,6 @@ class VideoLikes extends CActiveRecord
 					'value' => '$data->user->displayname',
 				);
 			}
-			$this->defaultColumns[] = array(
-				'name' => 'like_search',
-				'value' => 'CHtml::link($data->view->likes ? $data->view->likes : 0, Yii::app()->controller->createUrl("o/likedetail/manage",array(\'like\'=>$data->like_id,\'type\'=>\'publish\')))',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
-				'type' => 'raw',
-			);
-			$this->defaultColumns[] = array(
-				'name' => 'unlike_search',
-				'value' => 'CHtml::link($data->view->unlikes ? $data->view->unlikes : 0, Yii::app()->controller->createUrl("o/likedetail/manage",array(\'like\'=>$data->like_id,\'type\'=>\'unpublish\')))',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
-				'type' => 'raw',
-			);
 			$this->defaultColumns[] = array(
 				'name' => 'likes_date',
 				'value' => 'Utility::dateFormat($data->likes_date)',
@@ -299,30 +294,20 @@ class VideoLikes extends CActiveRecord
 				),
 			);
 			$this->defaultColumns[] = array(
-				'name' => 'updated_date',
-				'value' => 'Utility::dateFormat($data->updated_date)',
+				'name' => 'like_search',
+				'value' => 'CHtml::link($data->view->likes ? $data->view->likes : 0, Yii::app()->controller->createUrl("o/likedetail/manage",array(\'like\'=>$data->like_id,\'type\'=>\'publish\')))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
-				'filter' => Yii::app()->controller->widget('application.components.system.CJuiDatePicker', array(
-					'model'=>$this,
-					'attribute'=>'updated_date',
-					'language' => 'en',
-					'i18nScriptFile' => 'jquery-ui-i18n.min.js',
-					//'mode'=>'datetime',
-					'htmlOptions' => array(
-						'id' => 'updated_date_filter',
-					),
-					'options'=>array(
-						'showOn' => 'focus',
-						'dateFormat' => 'dd-mm-yy',
-						'showOtherMonths' => true,
-						'selectOtherMonths' => true,
-						'changeMonth' => true,
-						'changeYear' => true,
-						'showButtonPanel' => true,
-					),
-				), true),
+				'type' => 'raw',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'unlike_search',
+				'value' => 'CHtml::link($data->view->unlikes ? $data->view->unlikes : 0, Yii::app()->controller->createUrl("o/likedetail/manage",array(\'like\'=>$data->like_id,\'type\'=>\'unpublish\')))',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'type' => 'raw',
 			);
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(

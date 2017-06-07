@@ -32,6 +32,10 @@ plugin_menu		:
 	- urlTitle: Settings
 		urlRules: {siteType: "0,1", userLevel: 1}
 		urlPath: {url: o/setting/edit, attr: -, icon: -}
+                
+	- urlTitle: Video Manual Book
+		urlRules: {siteType: "0,1", userLevel: 2}
+		urlPath: {url: o/setting/manual, attr: -, icon: -}
 
 content_menu	:
 # controller o/admin
@@ -41,30 +45,39 @@ content_menu	:
 		
 # controller o/category
 	- urlTitle: Add Category
-		urlRules: {video, o/category, manage, siteType: "0,1", userLevel: "1,2"}
+		urlRules: {video, o/category, manage, siteType: "0,1", userLevel: 1}
 		urlPath: {url: add, attr: -, icon: -}
 		
 # controller o/views
-	- urlTitle: Back to video manage
-		urlRules: {video, o/views, manage, siteType: 1, userLevel: "1,2"}
+	- urlTitle: Back to Videos
+		urlRules: {video, o/views, manage, siteType: "0,1", userLevel: "1,2"}
 		urlPath: {url: o/admin/manage, attr: -, icon: -}
+	- urlTitle: View Video Views Data
+		urlRules: {video, o/views, manage, siteType: "0,1", userLevel: "1,2"}
+		urlPath: {url: o/viewdetail/manage, attr: -, icon: -}
 		
 # controller o/viewdetail
-	- urlTitle: Back to views manage
-		urlRules: {video, o/viewdetail, manage, siteType: 1, userLevel: "1,2"}
+	- urlTitle: Back to Album Views
+		urlRules: {video, o/viewdetail, manage, siteType: "0,1", userLevel: "1,2"}
 		urlPath: {url: o/views/manage, attr: -, icon: -}
 		
 # controller o/likes
-	- urlTitle: Back to video manage
+	- urlTitle: Back to Videos
 		urlRules: {video, o/likes, manage, siteType: 1, userLevel: "1,2"}
 		urlPath: {url: o/admin/manage, attr: -, icon: -}
+	- urlTitle: View Video Likes Data
+		urlRules: {video, o/likes, manage, siteType: 1, userLevel: "1,2"}
+		urlPath: {url: o/likedetail/manage, attr: -, icon: -}
 		
 # controller o/likedetail
-	- urlTitle: Back to likes manage
+	- urlTitle: Back to Album Likes
 		urlRules: {video, o/likedetail, manage, siteType: 1, userLevel: "1,2"}
 		urlPath: {url: o/likes/manage, attr: -, icon: -}
 		
 # controller o/setting
 	- urlTitle: Add Category
-		urlRules: {video, o/setting, edit, siteType: "0,1", userLevel: "1,2"}
+		urlRules: {video, o/setting, edit, siteType: "0,1", userLevel: 1}
 		urlPath: {url: o/category/add, attr: -, icon: -}
+	- urlTitle: KCKR Manual Book
+		urlRules: {video, o/setting, edit, siteType: "0,1", userLevel: 1}
+		urlPath: {url: manual, attr: -, icon: -}

@@ -66,6 +66,7 @@
 		<?php //begin.Grid Item ?>
 		<?php 
 			$columnData   = $columns;
+			/*
 			array_push($columnData, array(
 				'header' => Yii::t('phrase', 'Options'),
 				'class'=>'CButtonColumn',
@@ -94,6 +95,7 @@
 				),
 				'template' => '{delete}',
 			));
+			*/
 
 			$this->widget('application.components.system.OGridView', array(
 				'id'=>'video-like-detail-grid',

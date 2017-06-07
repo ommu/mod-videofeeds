@@ -29,18 +29,6 @@
 			<?php echo $form->errorSummary($model); ?>
 		</div>
 		<?php //begin.Messages ?>
-		
-		<div class="clearfix">
-			<?php echo $form->labelEx($model,'parent'); ?>
-			<div class="desc">
-				<?php if(VideoCategory::getCategory() != null) {
-					echo $form->dropDownList($model,'parent', VideoCategory::getCategory(), array('prompt'=>Yii::t('phrase', 'No Parent')));
-				} else {
-					echo $form->dropDownList($model,'parent', array(0=>Yii::t('phrase', 'No Parent')));
-				}?>
-				<?php echo $form->error($model,'parent'); ?>
-			</div>
-		</div>
 
 		<div class="clearfix">
 			<?php echo $form->labelEx($model,'title_i'); ?>

@@ -37,7 +37,9 @@ class VideoLikeDetail extends CActiveRecord
 	public $defaultColumns = array();
 	
 	// Variable Search
+	public $category_search;
 	public $video_search;
+	public $user_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -74,7 +76,7 @@ class VideoLikeDetail extends CActiveRecord
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('id, publish, like_id, likes_date, likes_ip,
-				video_search', 'safe', 'on'=>'search'),
+				category_search, video_search, user_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -101,7 +103,9 @@ class VideoLikeDetail extends CActiveRecord
 			'like_id' => Yii::t('attribute', 'Like'),
 			'likes_date' => Yii::t('attribute', 'Likes Date'),
 			'likes_ip' => Yii::t('attribute', 'Likes Ip'),
+			'category_search' => Yii::t('attribute', 'Category'),
 			'video_search' => Yii::t('attribute', 'Video'),
+			'user_search' => Yii::t('attribute', 'User'),
 		);
 		/*
 			'ID' => 'ID',
@@ -137,12 +141,16 @@ class VideoLikeDetail extends CActiveRecord
 				'alias'=>'like',
 			),
 			'like.video' => array(
-				'alias'=>'video',
-				'select'=>'title'
+				'alias'=>'like_video',
+				'select'=>'cat_id, title'
+			),
+			'like.user' => array(
+				'alias'=>'like_user',
+				'select'=>'displayname'
 			),
 		);
 
-		$criteria->compare('t.id',strtolower($this->id),true);
+		$criteria->compare('t.id',$this->id);
 		if(isset($_GET['type']) && $_GET['type'] == 'publish')
 			$criteria->compare('t.publish',1);
 		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
@@ -161,7 +169,9 @@ class VideoLikeDetail extends CActiveRecord
 			$criteria->compare('date(t.likes_date)',date('Y-m-d', strtotime($this->likes_date)));
 		$criteria->compare('t.likes_ip',strtolower($this->likes_ip),true);
 
-		$criteria->compare('video.title',strtolower($this->video_search), true);
+		$criteria->compare('like_video.cat_id',$this->category_search);
+		$criteria->compare('like_video.title',strtolower($this->video_search),true);
+		$criteria->compare('like_user.displayname',strtolower($this->user_search),true);
 
 		if(!isset($_GET['VideoLikeDetail_sort']))
 			$criteria->order = 't.id DESC';
@@ -213,9 +223,19 @@ class VideoLikeDetail extends CActiveRecord
 			);
 			if(!isset($_GET['like'])) {
 				$this->defaultColumns[] = array(
+					'name' => 'category_search',
+					'value' => 'Phrase::trans($data->like->video->cat->name)',
+					'filter'=> VideoCategory::getCategory(),
+					'type' => 'raw',
+				);
+				$this->defaultColumns[] = array(
 					'name' => 'video_search',
 					'value' => '$data->like->video->title',
 				);				
+				$this->defaultColumns[] = array(
+					'name' => 'user_search',
+					'value' => '$data->like->user->displayname',
+				);
 			}
 			$this->defaultColumns[] = array(
 				'name' => 'likes_date',

@@ -106,14 +106,12 @@ class ViewsController extends Controller
 	/**
 	 * Manages all models.
 	 */
-	public function actionManage() 
+	public function actionManage($video=null) 
 	{
-		$id = $_GET['video'];
-		$title = '';
-		if(isset($id) && $id != '') {
-			$video = Videos::model()->findByPk($id);
-			if($video != null)
-				$title = ': '.$video->title;
+		$pageTitle = Yii::t('phrase', 'Video Views');
+		if($video != null) {
+			$data = Videos::model()->findByPk($video);
+			$pageTitle = Yii::t('phrase', 'Video Views: $video_title from category $category_name', array ('$video_title'=>$data->title, '$category_name'=>Phrase::trans($data->cat->name)));
 		}
 		
 		$model=new VideoViews('search');
@@ -132,7 +130,7 @@ class ViewsController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Yii::t('phrase', 'Video Views Manage').$title;
+		$this->pageTitle = $pageTitle;
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('admin_manage',array(
@@ -194,7 +192,7 @@ class ViewsController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-video-views',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'VideoViews success deleted.').'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video views success deleted.').'</strong></div>',
 					));
 				}
 			}
@@ -204,7 +202,7 @@ class ViewsController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = Yii::t('phrase', 'VideoViews Delete.');
+			$this->pageTitle = Yii::t('phrase', 'Delete Views: $video_title', array('$video_title'=>$model->video->title));
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_delete');
@@ -227,6 +225,7 @@ class ViewsController extends Controller
 			$title = Yii::t('phrase', 'Publish');
 			$replace = 1;
 		}
+		$pageTitle = Yii::t('phrase', '$title Views: $video_title', array('$title'=>$title, '$video_title'=>$model->video->title));
 
 		if(Yii::app()->request->isPostRequest) {
 			// we only allow deletion via POST request
@@ -239,7 +238,7 @@ class ViewsController extends Controller
 						'type' => 5,
 						'get' => Yii::app()->controller->createUrl('manage'),
 						'id' => 'partial-video-views',
-						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'VideoViews success updated.').'</strong></div>',
+						'msg' => '<div class="errorSummary success"><strong>'.Yii::t('phrase', 'Video views success updated.').'</strong></div>',
 					));
 				}
 			}
@@ -249,7 +248,7 @@ class ViewsController extends Controller
 			$this->dialogGroundUrl = Yii::app()->controller->createUrl('manage');
 			$this->dialogWidth = 350;
 
-			$this->pageTitle = $title;
+			$this->pageTitle = $pageTitle;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
 			$this->render('admin_publish',array(

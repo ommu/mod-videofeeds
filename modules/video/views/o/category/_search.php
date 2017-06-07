@@ -30,11 +30,6 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('parent'); ?><br/>
-			<?php echo $form->textField($model,'parent'); ?>
-		</li>
-
-		<li>
 			<?php echo $model->getAttributeLabel('name'); ?><br/>
 			<?php echo $form->textField($model,'name',array('size'=>11,'maxlength'=>11)); ?>
 		</li>

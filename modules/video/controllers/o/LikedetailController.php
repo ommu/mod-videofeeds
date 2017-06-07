@@ -103,8 +103,16 @@ class LikedetailController extends Controller
 	/**
 	 * Manages all models.
 	 */
-	public function actionManage() 
+	public function actionManage($like=null) 
 	{
+		$pageTitle = Yii::t('phrase', 'Video Likes Data');
+		if($like != null) {
+			$data = VideoViews::model()->findByPk($like);
+			$pageTitle = Yii::t('phrase', 'Video Likes Data: $video_title from category $category_name - user Guest', array ('$video_title'=>$data->video->title, '$category_name'=>Phrase::trans($data->video->cat->name)));	
+			if($data->user->displayname)
+				$pageTitle = Yii::t('phrase', 'Video Likes Data: $video_title from category $category_name - user {user_displayname}', array ('$video_title'=>$data->video->title, '$category_name'=>Phrase::trans($data->video->cat->name), '{user_displayname}'=>$data->user->displayname));
+		}
+		
 		$model=new VideoLikeDetail('search');
 		$model->unsetAttributes();  // clear any default values
 		if(isset($_GET['VideoLikeDetail'])) {
@@ -121,7 +129,7 @@ class LikedetailController extends Controller
 		}
 		$columns = $model->getGridColumn($columnTemp);
 
-		$this->pageTitle = Yii::t('phrase', 'Video Like Details Manage');
+		$this->pageTitle = $pageTitle;
 		$this->pageDescription = '';
 		$this->pageMeta = '';
 		$this->render('/o/like_detail/admin_manage',array(
