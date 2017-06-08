@@ -21,7 +21,7 @@
 	<ul>
 		<li>
 			<?php echo $model->getAttributeLabel('video_id'); ?><br/>
-			<?php echo $form->textField($model,'video_id',array('size'=>11,'maxlength'=>11)); ?>
+			<?php echo $form->textField($model,'video_id'); ?>
 		</li>
 
 		<li>
@@ -36,17 +36,17 @@
 
 		<li>
 			<?php echo $model->getAttributeLabel('title'); ?><br/>
-			<?php echo $form->textField($model,'title',array('size'=>60,'maxlength'=>64)); ?>
+			<?php echo $form->textField($model,'title'); ?>
 		</li>
 
 		<li>
 			<?php echo $model->getAttributeLabel('body'); ?><br/>
-			<?php echo $form->textArea($model,'body',array('rows'=>6, 'cols'=>50)); ?>
+			<?php echo $form->textArea($model,'body'); ?>
 		</li>
 
 		<li>
 			<?php echo $model->getAttributeLabel('media'); ?><br/>
-			<?php echo $form->textField($model,'media',array('size'=>60,'maxlength'=>64)); ?>
+			<?php echo $form->textField($model,'media'); ?>
 		</li>
 
 		<li>
@@ -65,8 +65,18 @@
 		</li>
 
 		<li>
+			<?php echo $model->getAttributeLabel('creation_id'); ?><br/>
+			<?php echo $form->textField($model,'creation_id'); ?>
+		</li>
+
+		<li>
 			<?php echo $model->getAttributeLabel('modified_date'); ?><br/>
 			<?php echo $form->textField($model,'modified_date'); ?>
+		</li>
+
+		<li>
+			<?php echo $model->getAttributeLabel('modified_id'); ?><br/>
+			<?php echo $form->textField($model,'modified_id'); ?>
 		</li>
 
 		<li class="submit">

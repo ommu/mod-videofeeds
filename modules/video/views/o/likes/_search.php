@@ -22,17 +22,22 @@
 	<ul>
 		<li>
 			<?php echo $model->getAttributeLabel('like_id'); ?><br/>
-			<?php echo $form->textField($model,'like_id',array('size'=>11,'maxlength'=>11)); ?>
+			<?php echo $form->textField($model,'like_id'); ?>
+		</li>
+
+		<li>
+			<?php echo $model->getAttributeLabel('publish'); ?><br/>
+			<?php echo $form->textField($model,'publish'); ?>
 		</li>
 
 		<li>
 			<?php echo $model->getAttributeLabel('video_id'); ?><br/>
-			<?php echo $form->textField($model,'video_id',array('size'=>11,'maxlength'=>11)); ?>
+			<?php echo $form->textField($model,'video_id'); ?>
 		</li>
 
 		<li>
 			<?php echo $model->getAttributeLabel('user_id'); ?><br/>
-			<?php echo $form->textField($model,'user_id',array('size'=>11,'maxlength'=>11)); ?>
+			<?php echo $form->textField($model,'user_id'); ?>
 		</li>
 
 		<li>
@@ -42,7 +47,12 @@
 
 		<li>
 			<?php echo $model->getAttributeLabel('likes_ip'); ?><br/>
-			<?php echo $form->textField($model,'likes_ip',array('size'=>20,'maxlength'=>20)); ?>
+			<?php echo $form->textField($model,'likes_ip'); ?>
+		</li>
+
+		<li>
+			<?php echo $model->getAttributeLabel('updated_date'); ?><br/>
+			<?php echo $form->textField($model,'updated_date'); ?>
 		</li>
 
 		<li class="submit">
