@@ -6,7 +6,7 @@
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @copyright Copyright (c) 2017 Ommu Platform (opensource.ommu.co)
  * @created date 5 May 2017, 16:57 WIB
- * @link https://github.com/ommu/Video-Albums
+ * @link https://github.com/ommu/mod-video-album
  * @contact (+62)856-299-4114
  *
  * This is the template for generating the model class of a specified table.
@@ -107,14 +107,6 @@ class VideoLikeDetail extends CActiveRecord
 			'video_search' => Yii::t('attribute', 'Video'),
 			'user_search' => Yii::t('attribute', 'User'),
 		);
-		/*
-			'ID' => 'ID',
-			'Publish' => 'Publish',
-			'Like' => 'Like',
-			'Likes Date' => 'Likes Date',
-			'Likes Ip' => 'Likes Ip',
-		
-		*/
 	}
 
 	/**

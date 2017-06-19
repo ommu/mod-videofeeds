@@ -33,7 +33,7 @@ plugin_menu		:
 		urlRules: {siteType: "0,1", userLevel: 1}
 		urlPath: {url: o/setting/edit, attr: -, icon: -}
                 
-	- urlTitle: Video Manual Book
+	- urlTitle: Video Manual
 		urlRules: {siteType: "0,1", userLevel: 2}
 		urlPath: {url: o/setting/manual, attr: -, icon: -}
 
@@ -78,6 +78,6 @@ content_menu	:
 	- urlTitle: Add Category
 		urlRules: {video, o/setting, edit, siteType: "0,1", userLevel: 1}
 		urlPath: {url: o/category/add, attr: -, icon: -}
-	- urlTitle: Video Manual Book
+	- urlTitle: Video Manual
 		urlRules: {video, o/setting, edit, siteType: "0,1", userLevel: 1}
 		urlPath: {url: manual, attr: -, icon: -}
