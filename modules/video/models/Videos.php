@@ -36,8 +36,8 @@
  * @property string $modified_id
  *
  * The followings are the available model relations:
- * @property OmmuVideoLikes[] $ommuVideoLikes
- * @property OmmuVideoCategory $cat
+ * @property VideoLikes[] $VideoLikes
+ * @property VideoCategory $cat
  */
 class Videos extends CActiveRecord
 {

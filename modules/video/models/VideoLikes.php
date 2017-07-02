@@ -31,7 +31,7 @@
  * @property string $updated_date
  *
  * The followings are the available model relations:
- * @property OmmuVideos $video
+ * @property Videos $video
  */
 class VideoLikes extends CActiveRecord
 {
