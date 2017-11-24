@@ -348,7 +348,7 @@ class Videos extends CActiveRecord
 			if($setting->headline == 1) {
 				$this->defaultColumns[] = array(
 					'name' => 'headline',
-					'value' => 'in_array($data->cat_id, VideoSetting::getHeadlineCategory()) ? ($data->headline == 1 ? Chtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Utility::getPublish(Yii::app()->controller->createUrl("headline",array("id"=>$data->video_id)), $data->headline, 1)) : \'-\'',
+					'value' => 'in_array($data->cat_id, VideoSetting::getHeadlineCategory()) ? ($data->headline == 1 ? CHtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Utility::getPublish(Yii::app()->controller->createUrl("headline",array("id"=>$data->video_id)), $data->headline, 1)) : \'-\'',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
