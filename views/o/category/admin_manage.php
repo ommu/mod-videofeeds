@@ -3,12 +3,11 @@
  * Video Categories (video-category)
  * @var $this CategoryController 
  * @var $model VideoCategory
- * version: 0.0.1
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
+ * @contact (+62)856-299-4114
  * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
- * @contact (+62)856-299-4114
  *
  */
 
