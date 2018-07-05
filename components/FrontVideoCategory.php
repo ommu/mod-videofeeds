@@ -2,7 +2,7 @@
 /**
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2014 Ommu Platform (www.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
  *
  */
@@ -25,7 +25,7 @@ class FrontVideoCategory extends CWidget
 			),
 		));
 
-		$this->render('front_video_category',array(
+		$this->render('front_video_category', array(
 			'model' => $model,
 		));	
 	}

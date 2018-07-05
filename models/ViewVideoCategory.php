@@ -4,7 +4,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2015 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2015 Ommu Platform (www.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
  *
  * This is the template for generating the model class of a specified table.
@@ -113,11 +113,11 @@ class ViewVideoCategory extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.cat_id',$this->cat_id);
-		$criteria->compare('t.videos',$this->videos);
-		$criteria->compare('t.video_all',$this->video_all);
+		$criteria->compare('t.cat_id', $this->cat_id);
+		$criteria->compare('t.videos', $this->videos);
+		$criteria->compare('t.video_all', $this->video_all);
 
-		if(!isset($_GET['ViewVideoCategory_sort']))
+		if(!Yii::app()->getRequest()->getParam('ViewVideoCategory_sort'))
 			$criteria->order = 't.cat_id DESC';
 
 		return new CActiveDataProvider($this, array(
@@ -184,7 +184,7 @@ class ViewVideoCategory extends CActiveRecord
 	public static function getInfo($id, $column=null)
 	{
 		if($column != null) {
-			$model = self::model()->findByPk($id,array(
+			$model = self::model()->findByPk($id, array(
 				'select' => $column,
 			));
 			if(count(explode(',', $column)) == 1)

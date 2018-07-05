@@ -4,7 +4,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2017 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2017 Ommu Platform (www.ommu.co)
  * @created date 5 May 2017, 14:52 WIB
  * @link https://github.com/ommu/ommu-videofeeds
  *
@@ -120,13 +120,13 @@ class ViewVideos extends CActiveRecord
 
 		$criteria=new CDbCriteria;
 
-		$criteria->compare('t.video_id',$this->video_id);
-		$criteria->compare('t.views',$this->views);
-		$criteria->compare('t.view_all',$this->view_all);
-		$criteria->compare('t.likes',$this->likes);
-		$criteria->compare('t.like_all',$this->like_all);
+		$criteria->compare('t.video_id', $this->video_id);
+		$criteria->compare('t.views', $this->views);
+		$criteria->compare('t.view_all', $this->view_all);
+		$criteria->compare('t.likes', $this->likes);
+		$criteria->compare('t.like_all', $this->like_all);
 
-		if(!isset($_GET['ViewVideos_sort']))
+		if(!Yii::app()->getRequest()->getParam('ViewVideos_sort'))
 			$criteria->order = 't.video_id DESC';
 
 		return new CActiveDataProvider($this, array(
@@ -189,7 +189,7 @@ class ViewVideos extends CActiveRecord
 	public static function getInfo($id, $column=null)
 	{
 		if($column != null) {
-			$model = self::model()->findByPk($id,array(
+			$model = self::model()->findByPk($id, array(
 				'select' => $column,
 			));
 			if(count(explode(',', $column)) == 1)

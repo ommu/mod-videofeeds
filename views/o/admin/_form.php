@@ -7,7 +7,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2014 Ommu Platform (www.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
  *
  */
@@ -33,7 +33,7 @@
 		<div class="clearfix">
 			<?php echo $form->labelEx($model,'title'); ?>
 			<div class="desc">
-				<?php echo $form->textField($model,'title',array('maxlength'=>128,'class'=>'span-8')); ?>
+				<?php echo $form->textField($model,'title', array('maxlength'=>128,'class'=>'span-8')); ?>
 				<?php echo $form->error($model,'title'); ?>
 			</div>
 		</div>
@@ -42,7 +42,7 @@
 			<?php echo $form->labelEx($model,'body'); ?>
 			<div class="desc">
 				<?php 
-				//echo $form->textArea($model,'body',array('rows'=>6, 'cols'=>50, 'class'=>'span-11 smaller'));
+				//echo $form->textArea($model,'body', array('rows'=>6, 'cols'=>50, 'class'=>'span-11 smaller'));
 				$this->widget('yiiext.imperavi-redactor-widget.ImperaviRedactorWidget', array(
 					'model'=>$model,
 					'attribute'=>body,
@@ -69,7 +69,7 @@
 		<div class="clearfix">
 			<?php echo $form->labelEx($model,'media'); ?>
 			<div class="desc">
-				<?php echo $form->textField($model,'media',array('maxlength'=>32,'class'=>'span-6')); ?>
+				<?php echo $form->textField($model,'media', array('maxlength'=>32,'class'=>'span-6')); ?>
 				<?php echo $form->error($model,'media'); ?>
 				<span class="small-px">http://www.youtube.com/watch?v=<strong>HOAqSoDZSho</strong></span>
 			</div>

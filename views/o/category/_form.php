@@ -7,7 +7,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2014 Ommu Platform (www.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
  *
  */
@@ -35,7 +35,7 @@
 				<?php 
 				if(!$model->getErrors())
 					$model->title_i = Phrase::trans($model->name);
-				echo $form->textField($model,'title_i',array('maxlength'=>32,'class'=>'span-8')); ?>
+				echo $form->textField($model,'title_i', array('maxlength'=>32,'class'=>'span-8')); ?>
 				<?php echo $form->error($model,'title_i'); ?>
 			</div>
 		</div>
@@ -46,7 +46,7 @@
 				<?php 
 				if(!$model->getErrors())
 					$model->description_i = Phrase::trans($model->desc);
-				echo $form->textArea($model,'description_i',array('maxlength'=>64,'class'=>'span-11 smaller')); ?>
+				echo $form->textArea($model,'description_i', array('maxlength'=>64,'class'=>'span-11 smaller')); ?>
 				<?php echo $form->error($model,'description_i'); ?>
 			</div>
 		</div>
@@ -63,7 +63,7 @@
 	</fieldset>
 </div>
 <div class="dialog-submit">
-	<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save') ,array('onclick' => 'setEnableSave()')); ?>
+	<?php echo CHtml::submitButton($model->isNewRecord ? Yii::t('phrase', 'Create') : Yii::t('phrase', 'Save') , array('onclick' => 'setEnableSave()')); ?>
 	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
 </div>
 <?php $this->endWidget(); ?>

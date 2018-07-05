@@ -4,7 +4,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2017 Ommu Platform (opensource.ommu.co) 
+ * @copyright Copyright (c) 2017 Ommu Platform (www.ommu.co) 
  * @created date 5 May 2017, 12:54 WIB
  * @link https://github.com/ommu/ommu-videofeeds
  *
@@ -142,39 +142,39 @@ class VideoViews extends CActiveRecord
 			),
 		);
 
-		$criteria->compare('t.view_id',$this->view_id);
-		if(isset($_GET['type']) && $_GET['type'] == 'publish')
-			$criteria->compare('t.publish',1);
-		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
-			$criteria->compare('t.publish',0);
-		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
-			$criteria->compare('t.publish',2);
+		$criteria->compare('t.view_id', $this->view_id);
+		if(Yii::app()->getRequest()->getParam('type') == 'publish')
+			$criteria->compare('t.publish', 1);
+		elseif(Yii::app()->getRequest()->getParam('type') == 'unpublish')
+			$criteria->compare('t.publish', 0);
+		elseif(Yii::app()->getRequest()->getParam('type') == 'trash')
+			$criteria->compare('t.publish', 2);
 		else {
-			$criteria->addInCondition('t.publish',array(0,1));
-			$criteria->compare('t.publish',$this->publish);
+			$criteria->addInCondition('t.publish', array(0,1));
+			$criteria->compare('t.publish', $this->publish);
 		}
-		if(isset($_GET['video']))
-			$criteria->compare('t.video_id',$_GET['video']);
+		if(Yii::app()->getRequest()->getParam('video'))
+			$criteria->compare('t.video_id', Yii::app()->getRequest()->getParam('video'));
 		else
-			$criteria->compare('t.video_id',$this->video_id);
-		if(isset($_GET['user']))
-			$criteria->compare('t.user_id',$_GET['user']);
+			$criteria->compare('t.video_id', $this->video_id);
+		if(Yii::app()->getRequest()->getParam('user'))
+			$criteria->compare('t.user_id', Yii::app()->getRequest()->getParam('user'));
 		else
-			$criteria->compare('t.user_id',$this->user_id);
-		$criteria->compare('t.views',$this->views);
-		if($this->view_date != null && !in_array($this->view_date, array('0000-00-00 00:00:00', '0000-00-00')))
-			$criteria->compare('date(t.view_date)',date('Y-m-d', strtotime($this->view_date)));
-		$criteria->compare('t.view_ip',strtolower($this->view_ip),true);
-		if($this->deleted_date != null && !in_array($this->deleted_date, array('0000-00-00 00:00:00', '0000-00-00')))
-			$criteria->compare('date(t.deleted_date)',date('Y-m-d', strtotime($this->deleted_date)));
+			$criteria->compare('t.user_id', $this->user_id);
+		$criteria->compare('t.views', $this->views);
+		if($this->view_date != null && !in_array($this->view_date, array('0000-00-00 00:00:00','1970-01-01 00:00:00','0002-12-02 07:07:12','-0001-11-30 00:00:00')))
+			$criteria->compare('date(t.view_date)', date('Y-m-d', strtotime($this->view_date)));
+		$criteria->compare('t.view_ip', strtolower($this->view_ip), true);
+		if($this->deleted_date != null && !in_array($this->deleted_date, array('0000-00-00 00:00:00','1970-01-01 00:00:00','0002-12-02 07:07:12','-0001-11-30 00:00:00')))
+			$criteria->compare('date(t.deleted_date)', date('Y-m-d', strtotime($this->deleted_date)));
 		
-		$criteria->compare('video.cat_id',$this->category_search);
-		$criteria->compare('video.title',strtolower($this->video_search),true);
-		if(isset($_GET['video']) && isset($_GET['publish']))
-			$criteria->compare('video.publish',$_GET['publish']);
-		$criteria->compare('user.displayname',strtolower($this->user_search),true);
+		$criteria->compare('video.cat_id', $this->category_search);
+		$criteria->compare('video.title', strtolower($this->video_search), true);
+		if(Yii::app()->getRequest()->getParam('video') && Yii::app()->getRequest()->getParam('publish'))
+			$criteria->compare('video.publish', Yii::app()->getRequest()->getParam('publish'));
+		$criteria->compare('user.displayname', strtolower($this->user_search), true);
 
-		if(!isset($_GET['VideoViews_sort']))
+		if(!Yii::app()->getRequest()->getParam('VideoViews_sort'))
 			$criteria->order = 't.view_id DESC';
 
 		return new CActiveDataProvider($this, array(
@@ -233,7 +233,7 @@ class VideoViews extends CActiveRecord
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			if(!isset($_GET['video'])) {
+			if(!Yii::app()->getRequest()->getParam('video')) {
 				$this->defaultColumns[] = array(
 					'name' => 'category_search',
 					'value' => 'Phrase::trans($data->video->cat->name)',
@@ -245,7 +245,7 @@ class VideoViews extends CActiveRecord
 					'value' => '$data->video->title',
 				);
 			}
-			if(!isset($_GET['user'])) {
+			if(!Yii::app()->getRequest()->getParam('user')) {
 				$this->defaultColumns[] = array(
 					'name' => 'user_search',
 					'value' => '$data->user_id != 0 ? $data->user->displayname : "-"',
@@ -253,7 +253,7 @@ class VideoViews extends CActiveRecord
 			}
 			$this->defaultColumns[] = array(
 				'name' => 'views',
-				'value' => 'CHtml::link($data->views ? $data->views : 0, Yii::app()->controller->createUrl("o/viewdetail/manage",array(\'view\'=>$data->view_id)))',
+				'value' => 'CHtml::link($data->views ? $data->views : 0, Yii::app()->controller->createUrl("o/viewdetail/manage", array(\'view\'=>$data->view_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -276,7 +276,7 @@ class VideoViews extends CActiveRecord
 					),
 					'options'=>array(
 						'showOn' => 'focus',
-						'dateFormat' => 'dd-mm-yy',
+						'dateFormat' => 'yy-mm-dd',
 						'showOtherMonths' => true,
 						'selectOtherMonths' => true,
 						'changeMonth' => true,
@@ -292,10 +292,10 @@ class VideoViews extends CActiveRecord
 					'class' => 'center',
 				),
 			);
-			if(!isset($_GET['type'])) {
+			if(!Yii::app()->getRequest()->getParam('type')) {
 				$this->defaultColumns[] = array(
 					'name' => 'publish',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->view_id)), $data->publish, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish", array("id"=>$data->view_id)), $data->publish, 1)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
@@ -316,7 +316,7 @@ class VideoViews extends CActiveRecord
 	public static function getInfo($id, $column=null)
 	{
 		if($column != null) {
-			$model = self::model()->findByPk($id,array(
+			$model = self::model()->findByPk($id, array(
 				'select' => $column,
 			));
 			if(count(explode(',', $column)) == 1)

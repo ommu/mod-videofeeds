@@ -6,7 +6,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2014 Ommu Platform (www.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
  *
  */
@@ -20,7 +20,7 @@
 
 <?php //begin.Search ?>
 <div class="search-form">
-<?php $this->renderPartial('/o/category/_search',array(
+<?php $this->renderPartial('/o/category/_search', array(
 	'model'=>$category,
 )); ?>
 </div>
@@ -28,7 +28,7 @@
 
 <?php //begin.Grid Option ?>
 <div class="grid-form">
-<?php $this->renderPartial('/o/category/_option_form',array(
+<?php $this->renderPartial('/o/category/_option_form', array(
 	'model'=>$category,
 )); ?>
 </div>
@@ -60,19 +60,19 @@
 						'options' => array(							
 							'class' => 'view',
 						),
-						'url' => 'Yii::app()->controller->createUrl("o/category/view",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("o/category/view", array("id"=>$data->primaryKey))'),
 					'update' => array(
 						'label' => 'update',
 						'options' => array(
 							'class' => 'update'
 						),
-						'url' => 'Yii::app()->controller->createUrl("o/category/edit",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("o/category/edit", array("id"=>$data->primaryKey))'),
 					'delete' => array(
 						'label' => 'delete',
 						'options' => array(
 							'class' => 'delete'
 						),
-						'url' => 'Yii::app()->controller->createUrl("o/category/delete",array("id"=>$data->primaryKey))')
+						'url' => 'Yii::app()->controller->createUrl("o/category/delete", array("id"=>$data->primaryKey))')
 				),
 				'template' => '{update}|{delete}',
 			));

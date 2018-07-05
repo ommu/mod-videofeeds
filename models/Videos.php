@@ -4,7 +4,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2014 Ommu Platform (www.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
  *
  * This is the template for generating the model class of a specified table.
@@ -55,7 +55,7 @@ class Videos extends CActiveRecord
 	{
 		return array(
 			'sluggable' => array(
-				'class'=>'ext.yii-behavior-sluggable.SluggableBehavior',
+				'class'=>'ext.yii-sluggable.SluggableBehavior',
 				'columns' => array('title'),
 				'unique' => true,
 				'update' => true,
@@ -177,45 +177,45 @@ class Videos extends CActiveRecord
 			),
 		);
 
-		$criteria->compare('t.video_id',$this->video_id);
-		if(isset($_GET['type']) && $_GET['type'] == 'publish')
-			$criteria->compare('t.publish',1);
-		elseif(isset($_GET['type']) && $_GET['type'] == 'unpublish')
-			$criteria->compare('t.publish',0);
-		elseif(isset($_GET['type']) && $_GET['type'] == 'trash')
-			$criteria->compare('t.publish',2);
+		$criteria->compare('t.video_id', $this->video_id);
+		if(Yii::app()->getRequest()->getParam('type') == 'publish')
+			$criteria->compare('t.publish', 1);
+		elseif(Yii::app()->getRequest()->getParam('type') == 'unpublish')
+			$criteria->compare('t.publish', 0);
+		elseif(Yii::app()->getRequest()->getParam('type') == 'trash')
+			$criteria->compare('t.publish', 2);
 		else {
-			$criteria->addInCondition('t.publish',array(0,1));
-			$criteria->compare('t.publish',$this->publish);
+			$criteria->addInCondition('t.publish', array(0,1));
+			$criteria->compare('t.publish', $this->publish);
 		}
-		if(isset($_GET['category']))
-			$criteria->compare('t.cat_id',$_GET['category']);
+		if(Yii::app()->getRequest()->getParam('category'))
+			$criteria->compare('t.cat_id', Yii::app()->getRequest()->getParam('category'));
 		else
-			$criteria->compare('t.cat_id',$this->cat_id);
-		$criteria->compare('t.title',strtolower($this->title),true);
-		$criteria->compare('t.body',strtolower($this->body),true);
-		$criteria->compare('t.media',strtolower($this->media),true);
-		$criteria->compare('t.headline',$this->headline);
-		$criteria->compare('t.comment_code',$this->comment_code);
-		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
-			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
-		if(isset($_GET['creation']))
-			$criteria->compare('t.creation_id',$_GET['creation']);
+			$criteria->compare('t.cat_id', $this->cat_id);
+		$criteria->compare('t.title', strtolower($this->title), true);
+		$criteria->compare('t.body', strtolower($this->body), true);
+		$criteria->compare('t.media', strtolower($this->media), true);
+		$criteria->compare('t.headline', $this->headline);
+		$criteria->compare('t.comment_code', $this->comment_code);
+		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00','1970-01-01 00:00:00','0002-12-02 07:07:12','-0001-11-30 00:00:00')))
+			$criteria->compare('date(t.creation_date)', date('Y-m-d', strtotime($this->creation_date)));
+		if(Yii::app()->getRequest()->getParam('creation'))
+			$criteria->compare('t.creation_id', Yii::app()->getRequest()->getParam('creation'));
 		else
-			$criteria->compare('t.creation_id',$this->creation_id);
-		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
-			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
-		if(isset($_GET['modified']))
-			$criteria->compare('t.modified_id',$_GET['modified']);
+			$criteria->compare('t.creation_id', $this->creation_id);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00','1970-01-01 00:00:00','0002-12-02 07:07:12','-0001-11-30 00:00:00')))
+			$criteria->compare('date(t.modified_date)', date('Y-m-d', strtotime($this->modified_date)));
+		if(Yii::app()->getRequest()->getParam('modified'))
+			$criteria->compare('t.modified_id', Yii::app()->getRequest()->getParam('modified'));
 		else
-			$criteria->compare('t.modified_id',$this->modified_id);
+			$criteria->compare('t.modified_id', $this->modified_id);
 		
-		$criteria->compare('creation.displayname',strtolower($this->creation_search),true);
-		$criteria->compare('modified.displayname',strtolower($this->modified_search),true);
-		$criteria->compare('view.views',$this->view_search);
-		$criteria->compare('view.likes',$this->like_search);
+		$criteria->compare('creation.displayname', strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname', strtolower($this->modified_search), true);
+		$criteria->compare('view.views', $this->view_search);
+		$criteria->compare('view.likes', $this->like_search);
 
-		if(!isset($_GET['Videos_sort']))
+		if(!Yii::app()->getRequest()->getParam('Videos_sort'))
 			$criteria->order = 't.video_id DESC';
 
 		return new CActiveDataProvider($this, array(
@@ -288,7 +288,7 @@ class Videos extends CActiveRecord
 				'name' => 'title',
 				'value' => '$data->title',
 			);
-			if(!isset($_GET['category'])) {
+			if(!Yii::app()->getRequest()->getParam('category')) {
 				$this->defaultColumns[] = array(
 					'name' => 'cat_id',
 					'value' => 'Phrase::trans($data->cat->name)',
@@ -317,7 +317,7 @@ class Videos extends CActiveRecord
 					),
 					'options'=>array(
 						'showOn' => 'focus',
-						'dateFormat' => 'dd-mm-yy',
+						'dateFormat' => 'yy-mm-dd',
 						'showOtherMonths' => true,
 						'selectOtherMonths' => true,
 						'changeMonth' => true,
@@ -328,7 +328,7 @@ class Videos extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'view_search',
-				'value' => 'CHtml::link($data->view->views ? $data->view->views : 0, Yii::app()->controller->createUrl("o/views/manage",array(\'video\'=>$data->video_id)))',
+				'value' => 'CHtml::link($data->view->views ? $data->view->views : 0, Yii::app()->controller->createUrl("o/views/manage", array(\'video\'=>$data->video_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -337,7 +337,7 @@ class Videos extends CActiveRecord
 			if(OmmuSettings::getInfo('site_type') == '1') {
 				$this->defaultColumns[] = array(
 					'name' => 'like_search',
-					'value' => 'CHtml::link($data->view->likes ? $data->view->likes : 0, Yii::app()->controller->createUrl("o/likes/manage",array(\'video\'=>$data->video_id)))',
+					'value' => 'CHtml::link($data->view->likes ? $data->view->likes : 0, Yii::app()->controller->createUrl("o/likes/manage", array(\'video\'=>$data->video_id)))',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
@@ -347,7 +347,7 @@ class Videos extends CActiveRecord
 			if($setting->headline == 1) {
 				$this->defaultColumns[] = array(
 					'name' => 'headline',
-					'value' => 'in_array($data->cat_id, VideoSetting::getHeadlineCategory()) ? ($data->headline == 1 ? CHtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Utility::getPublish(Yii::app()->controller->createUrl("headline",array("id"=>$data->video_id)), $data->headline, 1)) : \'-\'',
+					'value' => 'in_array($data->cat_id, VideoSetting::getHeadlineCategory()) ? ($data->headline == 1 ? CHtml::image(Yii::app()->theme->baseUrl.\'/images/icons/publish.png\') : Utility::getPublish(Yii::app()->controller->createUrl("headline", array("id"=>$data->video_id)), $data->headline, 1)) : \'-\'',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
@@ -358,10 +358,10 @@ class Videos extends CActiveRecord
 					'type' => 'raw',
 				);
 			}
-			if(!isset($_GET['type'])) {
+			if(!Yii::app()->getRequest()->getParam('type')) {
 				$this->defaultColumns[] = array(
 					'name' => 'publish',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->video_id)), $data->publish, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish", array("id"=>$data->video_id)), $data->publish, 1)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
@@ -382,7 +382,7 @@ class Videos extends CActiveRecord
 	public static function getInfo($id, $column=null)
 	{
 		if($column != null) {
-			$model = self::model()->findByPk($id,array(
+			$model = self::model()->findByPk($id, array(
 				'select' => $column,
 			));
 			if(count(explode(',', $column)) == 1)

@@ -15,7 +15,7 @@
  *
  * @author Putra Sudaryanto <putra@sudaryanto.id>
  * @contact (+62)856-299-4114
- * @copyright Copyright (c) 2014 Ommu Platform (opensource.ommu.co)
+ * @copyright Copyright (c) 2014 Ommu Platform (www.ommu.co)
  * @link https://github.com/ommu/ommu-videofeeds
  *
  *----------------------------------------------------------------------------------------------------------
@@ -89,7 +89,7 @@ class SiteController extends Controller
 	 */
 	public function actionIndex() 
 	{
-		$setting = VideoSetting::model()->findByPk(1,array(
+		$setting = VideoSetting::model()->findByPk(1, array(
 			'select' => 'meta_description, meta_keyword',
 		));
 
@@ -109,7 +109,7 @@ class SiteController extends Controller
 		$this->pageTitle = 'Video BPAD Jogja';
 		$this->pageDescription = $setting->meta_description;
 		$this->pageMeta = $setting->meta_keyword;
-		$this->render('front_index',array(
+		$this->render('front_index', array(
 			'dataProvider'=>$dataProvider,
 		));
 	}
@@ -120,7 +120,7 @@ class SiteController extends Controller
 	 */
 	public function actionView($id) 
 	{
-		$setting = VideoSetting::model()->findByPk(1,array(
+		$setting = VideoSetting::model()->findByPk(1, array(
 			'select' => 'meta_keyword',
 		));
 
@@ -131,7 +131,7 @@ class SiteController extends Controller
 		$this->pageTitle = $model->title;
 		$this->pageDescription = Utility::shortText(Utility::hardDecode($model->body),300);
 		$this->pageMeta = $setting->meta_keyword;
-		$this->render('front_view',array(
+		$this->render('front_view', array(
 			'model'=>$model,
 		));
 	}
