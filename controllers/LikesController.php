@@ -104,7 +104,7 @@ class LikesController extends Controller
 			$model=new VideoLikes;
 			$model->video_id = $id;
 			if($model->save()) {
-				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>Utility::getUrlTitle($model->video->title)));
+				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>$this->urlTitle($model->video->title)));
 			}	
 		}
 	}
@@ -120,7 +120,7 @@ class LikesController extends Controller
 		} else {
 			$model=$this->loadModel($id);
 			if($model->delete()) {
-				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>Utility::getUrlTitle($model->video->title)));
+				$this->redirect(array('site/view','id'=>$model->video_id,'t'=>$this->urlTitle($model->video->title)));
 			}	
 		}
 	}
