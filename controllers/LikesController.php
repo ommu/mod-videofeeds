@@ -37,7 +37,7 @@ class LikesController extends Controller
 	public function init() 
 	{
 		if(VideoSetting::getInfo('permission') == 1) {
-			$arrThemes = Utility::getCurrentTemplate('public');
+			$arrThemes = $this->currentTemplate('public');
 			Yii::app()->theme = $arrThemes['folder'];
 			$this->layout = $arrThemes['layout'];
 		} else {
