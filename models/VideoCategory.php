@@ -350,7 +350,7 @@ class VideoCategory extends CActiveRecord
 	 * 0 = unpublish
 	 * 1 = publish
 	 */
-	public static function getCategory($publish=null, $type=null) 
+	public static function getCategory($publish=null, $array=true) 
 	{
 		$criteria=new CDbCriteria;
 		if($publish != null)
@@ -358,7 +358,7 @@ class VideoCategory extends CActiveRecord
 		
 		$model = self::model()->findAll($criteria);		
 
-		if($type == null) {
+		if($array == true) {
 			$items = array();
 			if($model != null) {
 				foreach($model as $key => $val) {
@@ -368,7 +368,7 @@ class VideoCategory extends CActiveRecord
 			} else
 				return false;
 			
-		} else if($type == 'data')
+		} else
 			return $model;
 	}
 
