@@ -19,7 +19,7 @@
 
 <div class="meta-date clearfix">
 	<span class="tag"><i class="fa fa-tag"></i>&nbsp;<?php echo Phrase::trans($model->cat->name,2);?></span>
-	<span class="date"><i class="fa fa-calendar"></i>&nbsp;<?php echo $this->dateFormat($model->creation_date, true);?></span>
+	<span class="date"><i class="fa fa-calendar"></i>&nbsp;<?php echo $this->dateFormat($model->creation_date);?></span>
 	<span class="by"><i class="fa fa-user"></i>&nbsp;<?php echo $model->user->displayname;?></span>
 	<span class="view"><i class="fa fa-eye"></i>&nbsp;<?php echo $model->view;?></span>
 </div>
