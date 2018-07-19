@@ -113,7 +113,7 @@ class ViewdetailController extends Controller
 		}
 		
 		$model=new VideoViewDetail('search');
-		$model->unsetAttributes();  // clear any default values
+		$model->unsetAttributes();	// clear any default values
 		if(isset($_GET['VideoViewDetail'])) {
 			$model->attributes=$_GET['VideoViewDetail'];
 		}

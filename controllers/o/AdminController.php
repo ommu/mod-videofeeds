@@ -116,7 +116,7 @@ class AdminController extends Controller
 		}
 		
 		$model=new Videos('search');
-		$model->unsetAttributes();  // clear any default values
+		$model->unsetAttributes();	// clear any default values
 		if(isset($_GET['Videos'])) {
 			$model->attributes=$_GET['Videos'];
 		}

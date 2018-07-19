@@ -113,7 +113,7 @@ class SettingController extends Controller
 			throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		
 		$category=new VideoCategory('search');
-		$category->unsetAttributes();  // clear any default values
+		$category->unsetAttributes();	// clear any default values
 		if(isset($_GET['VideoCategory'])) {
 			$category->attributes=$_GET['VideoCategory'];
 		}

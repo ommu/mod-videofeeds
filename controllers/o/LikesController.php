@@ -114,7 +114,7 @@ class LikesController extends Controller
 		}
 		
 		$model=new VideoLikes('search');
-		$model->unsetAttributes();  // clear any default values
+		$model->unsetAttributes();	// clear any default values
 		if(isset($_GET['VideoLikes'])) {
 			$model->attributes=$_GET['VideoLikes'];
 		}

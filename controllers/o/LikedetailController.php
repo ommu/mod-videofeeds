@@ -113,7 +113,7 @@ class LikedetailController extends Controller
 		}
 		
 		$model=new VideoLikeDetail('search');
-		$model->unsetAttributes();  // clear any default values
+		$model->unsetAttributes();	// clear any default values
 		if(isset($_GET['VideoLikeDetail'])) {
 			$model->attributes=$_GET['VideoLikeDetail'];
 		}
