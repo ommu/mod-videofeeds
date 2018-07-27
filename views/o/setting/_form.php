@@ -26,7 +26,7 @@ EOP;
 	$cs->registerScript('resize', $js, CClientScript::POS_END); 
 ?>
 
-<?php $form=$this->beginWidget('CActiveForm', array(
+<?php $form=$this->beginWidget('application.libraries.yii-traits.system.OActiveForm', array(
 	'id'=>'video-setting-form',
 	'enableAjaxValidation'=>true,
 	//'htmlOptions' => array('enctype' => 'multipart/form-data')

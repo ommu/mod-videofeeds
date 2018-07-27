@@ -131,15 +131,15 @@ class VideoLikeDetail extends CActiveRecord
 		// Custom Search
 		$criteria->with = array(
 			'like' => array(
-				'alias'=>'like',
+				'alias' => 'like',
 			),
 			'like.video' => array(
-				'alias'=>'like_video',
-				'select'=>'cat_id, title'
+				'alias' => 'like_video',
+				'select' => 'cat_id, title'
 			),
 			'like.user' => array(
-				'alias'=>'like_user',
-				'select'=>'displayname'
+				'alias' => 'like_user',
+				'select' => 'displayname'
 			),
 		);
 
@@ -218,7 +218,7 @@ class VideoLikeDetail extends CActiveRecord
 				$this->defaultColumns[] = array(
 					'name' => 'category_search',
 					'value' => 'Phrase::trans($data->like->video->cat->name)',
-					'filter'=> VideoCategory::getCategory(),
+					'filter' => VideoCategory::getCategory(),
 					'type' => 'raw',
 				);
 				$this->defaultColumns[] = array(

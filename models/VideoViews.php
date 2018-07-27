@@ -135,12 +135,12 @@ class VideoViews extends CActiveRecord
 		// Custom Search
 		$criteria->with = array(
 			'video' => array(
-				'alias'=>'video',
-				'select'=>'publish, cat_id, title'
+				'alias' => 'video',
+				'select' => 'publish, cat_id, title'
 			),
 			'user' => array(
-				'alias'=>'user',
-				'select'=>'displayname',
+				'alias' => 'user',
+				'select' => 'displayname',
 			),
 		);
 
@@ -239,7 +239,7 @@ class VideoViews extends CActiveRecord
 				$this->defaultColumns[] = array(
 					'name' => 'category_search',
 					'value' => 'Phrase::trans($data->video->cat->name)',
-					'filter'=> VideoCategory::getCategory(),
+					'filter' => VideoCategory::getCategory(),
 					'type' => 'raw',
 				);
 				$this->defaultColumns[] = array(
