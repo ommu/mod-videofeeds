@@ -29,7 +29,6 @@ EOP;
 <?php $form=$this->beginWidget('application.libraries.yii-traits.system.OActiveForm', array(
 	'id'=>'video-setting-form',
 	'enableAjaxValidation'=>true,
-	//'htmlOptions' => array('enctype' => 'multipart/form-data')
 )); ?>
 
 	<?php //begin.Messages ?>
@@ -46,23 +45,21 @@ EOP;
 				<span><?php echo Yii::t('phrase', 'Enter the your license key that is provided to you when you purchased this plugin. If you do not know your license key, please contact support team.');?></span>
 			</label>
 			<div class="desc">
-				<?php 
-				if($model->isNewRecord || (!$model->isNewRecord && $model->license == '')) {
+				<?php if($model->isNewRecord || (!$model->isNewRecord && $model->license == '')) {
 					$model->license = $this->licenseCode();
 					echo $form->textField($model,'license', array('maxlength'=>32,'class'=>'span-4'));
 				} else
 					echo $form->textField($model,'license', array('maxlength'=>32,'class'=>'span-4','disabled'=>'disabled'));?>
 				<?php echo $form->error($model,'license'); ?>
-				<span class="small-px"><?php echo Yii::t('phrase', 'Format: XXXX-XXXX-XXXX-XXXX');?></span>
+				<div class="small-px"><?php echo Yii::t('phrase', 'Format: XXXX-XXXX-XXXX-XXXX');?></div>
 			</div>
 		</div>
 
 		<div class="clearfix">
 			<?php echo $form->labelEx($model,'permission'); ?>
 			<div class="desc">
-				<span class="small-px"><?php echo Yii::t('phrase', 'Select whether or not you want to let the public (visitors that are not logged-in) to view the following sections of your social network. In some cases (such as Profiles, Blogs, and Albums), if you have given them the option, your users will be able to make their pages private even though you have made them publically viewable here. For more permissions settings, please visit the General Settings page.');?></span>
-				<?php 
-				if($model->isNewRecord && !$model->getErrors())
+				<div class="small-px"><?php echo Yii::t('phrase', 'Select whether or not you want to let the public (visitors that are not logged-in) to view the following sections of your social network. In some cases (such as Profiles, Blogs, and Albums), if you have given them the option, your users will be able to make their pages private even though you have made them publically viewable here. For more permissions settings, please visit the General Settings page.');?></div>
+				<?php if($model->isNewRecord && !$model->getErrors())
 					$model->permission = 1;
 				echo $form->radioButtonList($model, 'permission', array(
 					1 => Yii::t('phrase', 'Yes, the public can view video feeder unless they are made private.'),
@@ -91,8 +88,7 @@ EOP;
 		<div class="clearfix">
 			<?php echo $form->labelEx($model,'headline'); ?>
 			<div class="desc">
-				<?php 
-				if($model->isNewRecord && !$model->getErrors())
+				<?php if($model->isNewRecord && !$model->getErrors())
 					$model->headline = 1;
 				echo $form->dropDownLIst($model,'headline', array(
 					'1' => Yii::t('phrase', 'Enable'),
@@ -106,8 +102,7 @@ EOP;
 			<div class="clearfix">
 				<?php echo $form->labelEx($model,'headline_limit'); ?>
 				<div class="desc">
-					<?php 
-					if($model->isNewRecord && !$model->getErrors())
+					<?php if($model->isNewRecord && !$model->getErrors())
 						$model->headline_limit = 0;
 					echo $form->textField($model,'headline_limit', array('maxlength'=>3, 'class'=>'span-2')); ?>
 					<?php echo $form->error($model,'headline_limit'); ?>

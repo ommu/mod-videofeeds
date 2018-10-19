@@ -304,7 +304,7 @@ class VideoCategory extends CActiveRecord
 			);
 			$this->defaultColumns[] = array(
 				'name' => 'video_search',
-				'value' => 'CHtml::link($data->view->videos ? $data->view->videos : 0, Yii::app()->controller->createUrl("o/admin/manage", array("category"=>$data->cat_id)))',
+				'value' => 'CHtml::link($data->view->videos ? $data->view->videos : 0, Yii::app()->controller->createUrl(\'o/admin/manage\', array("category"=>$data->cat_id)))',
 				'htmlOptions' => array(
 					'class' => 'center',
 				),
@@ -313,7 +313,7 @@ class VideoCategory extends CActiveRecord
 			if(!Yii::app()->getRequest()->getParam('type')) {
 				$this->defaultColumns[] = array(
 					'name' => 'publish',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish", array("id"=>$data->cat_id)), $data->publish, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl(\'publish\', array(\'id\'=>$data->cat_id)), $data->publish, 1)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),

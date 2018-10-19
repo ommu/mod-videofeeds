@@ -13,7 +13,7 @@
 
 	$this->breadcrumbs=array(
 		'Video Settings'=>array('manage'),
-		'Manual Book',
+		Yii::t('phrase', 'Manual'),
 	);
 ?>
 

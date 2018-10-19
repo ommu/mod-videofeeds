@@ -14,14 +14,13 @@
 
 	$this->breadcrumbs=array(
 		'Video Categories'=>array('manage'),
-		'Publish',
+		Yii::t('phrase', 'Publish'),
 	);
 ?>
 
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'video-category-form',
 	'enableAjaxValidation'=>true,
-	//'htmlOptions' => array('enctype' => 'multipart/form-data')
 )); ?>
 
 	<div class="dialog-content">

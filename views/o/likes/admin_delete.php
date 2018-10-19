@@ -15,14 +15,13 @@
 
 	$this->breadcrumbs=array(
 		'Video Likes'=>array('manage'),
-		'Delete',
+		Yii::t('phrase', 'Delete'),
 	);
 ?>
 
 <?php $form=$this->beginWidget('CActiveForm', array(
 	'id'=>'video-like-form',
 	'enableAjaxValidation'=>true,
-	//'htmlOptions' => array('enctype' => 'multipart/form-data')
 )); ?>
 	<div class="dialog-content">
 		<?php echo Yii::t('phrase', 'Are you sure you want to delete this item?');?>

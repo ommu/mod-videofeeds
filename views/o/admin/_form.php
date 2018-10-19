@@ -16,7 +16,6 @@
 <?php $form=$this->beginWidget('application.libraries.yii-traits.system.OActiveForm', array(
 	'id'=>'videos-form',
 	'enableAjaxValidation'=>true,
-	//'htmlOptions' => array('enctype' => 'multipart/form-data')
 )); ?>
 <div class="dialog-content">
 	<fieldset>
@@ -41,14 +40,10 @@
 		<div class="clearfix">
 			<?php echo $form->labelEx($model,'body'); ?>
 			<div class="desc">
-				<?php 
-				//echo $form->textArea($model,'body', array('rows'=>6, 'cols'=>50, 'class'=>'span-11 smaller'));
-				$this->widget('yiiext.imperavi-redactor-widget.ImperaviRedactorWidget', array(
+				<?php $this->widget('yiiext.imperavi-redactor-widget.ImperaviRedactorWidget', array(
 					'model'=>$model,
 					'attribute'=>body,
-					// Redactor options
 					'options'=>array(
-						//'lang'=>'fi',
 						'buttons'=>array(
 							'html', 'formatting', '|', 
 							'bold', 'italic', 'deleted', '|',
@@ -71,7 +66,7 @@
 			<div class="desc">
 				<?php echo $form->textField($model,'media', array('maxlength'=>32,'class'=>'span-6')); ?>
 				<?php echo $form->error($model,'media'); ?>
-				<span class="small-px">http://www.youtube.com/watch?v=<strong>HOAqSoDZSho</strong></span>
+				<div class="small-px">http://www.youtube.com/watch?v=<strong>HOAqSoDZSho</strong></div>
 			</div>
 		</div>
 

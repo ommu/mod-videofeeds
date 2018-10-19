@@ -250,7 +250,7 @@ class VideoViews extends CActiveRecord
 			if(!Yii::app()->getRequest()->getParam('user')) {
 				$this->defaultColumns[] = array(
 					'name' => 'user_search',
-					'value' => '$data->user_id != 0 ? $data->user->displayname : "-"',
+					'value' => '$data->user_id != 0 ? $data->user->displayname : \'-\'',
 				);
 			}
 			$this->defaultColumns[] = array(
@@ -279,7 +279,7 @@ class VideoViews extends CActiveRecord
 			if(!Yii::app()->getRequest()->getParam('type')) {
 				$this->defaultColumns[] = array(
 					'name' => 'publish',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish", array("id"=>$data->view_id)), $data->publish, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl(\'publish\', array(\'id\'=>$data->view_id)), $data->publish, 1)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),

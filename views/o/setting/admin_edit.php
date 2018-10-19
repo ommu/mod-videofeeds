@@ -14,7 +14,7 @@
 	$this->breadcrumbs=array(
 		'Video Settings'=>array('manage'),
 		$model->id=>array('view','id'=>$model->id),
-		'Update',
+		Yii::t('phrase', 'Update'),
 	);
 ?>
 
@@ -61,21 +61,21 @@
 						'options' => array(
 							'class' => 'view',
 						),
-						'url' => 'Yii::app()->controller->createUrl("o/category/view", array(\'id\'=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl(\'o/category/view\', array(\'id\'=>$data->primaryKey))'),
 					'update' => array(
 						'label' => 'update',
 						'imageUrl' => Yii::app()->params['grid-view']['buttonImageUrl'],
 						'options' => array(
 							'class' => 'update',
 						),
-						'url' => 'Yii::app()->controller->createUrl("o/category/edit", array(\'id\'=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl(\'o/category/edit\', array(\'id\'=>$data->primaryKey))'),
 					'delete' => array(
 						'label' => 'delete',
 						'imageUrl' => Yii::app()->params['grid-view']['buttonImageUrl'],
 						'options' => array(
 							'class' => 'delete',
 						),
-						'url' => 'Yii::app()->controller->createUrl("o/category/delete", array(\'id\'=>$data->primaryKey))')
+						'url' => 'Yii::app()->controller->createUrl(\'o/category/delete\', array(\'id\'=>$data->primaryKey))')
 				),
 				'template' => '{update}|{delete}',
 			));

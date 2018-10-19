@@ -15,7 +15,7 @@
 	$this->breadcrumbs=array(
 		'Videoses'=>array('manage'),
 		$model->title=>array('view','id'=>$model->video_id),
-		'Update',
+		Yii::t('phrase', 'Update'),
 	);
 ?>
 
